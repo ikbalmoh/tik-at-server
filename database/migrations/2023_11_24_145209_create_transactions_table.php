@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('operator_id');
             $table->smallInteger('qty')->default(1);
+            $table->boolean('is_group')->default(false);
             $table->double('price');
             $table->double('subtotal');
             $table->double('discount')->default(0);
