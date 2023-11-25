@@ -12,13 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tickets', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id');
             $table->unsignedBigInteger('transaction_id');
-            $table->uuid('uuid');
-            $table->string('ticket_no');
             $table->tinyInteger('entrance_max')->default(1);
             $table->tinyInteger('entrance_count')->default(0);
-            $table->string('entrance_gate')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });

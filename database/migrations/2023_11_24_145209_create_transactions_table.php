@@ -24,6 +24,7 @@ return new class extends Migration
             $table->double('pay');
             $table->double('charge')->default(0);
             $table->string('payment_method')->default('cash');
+            $table->string('gate', 10)->default('1');
             $table->timestamps();
 
             $table->foreign('type_id')->references('id')->on('ticket_types');
