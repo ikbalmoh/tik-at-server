@@ -46,14 +46,16 @@ class TransactionController extends Controller
 
             $ticket_transaction = [
                 'is_group' => $transaction->is_group,
-                'datetime' => $transaction->created_at,
+                'purchase_date' => $transaction->created_at,
+                'gate' => $transaction->gate,
             ];
             foreach ($transaction->tickets as $key => $ticket) {
                 $tickets[] = array_merge([
                     'id' => $ticket->id,
-                    'expired_at' => $ticket->expired_at,
                     'entrance_max' => $ticket->entrance_max,
-                    'ticket_type' => $ticket->ticket_type_name,
+                    'entrance_count' => $ticket->entrance_count,
+                    'expires_at' => $ticket->expired_at,
+                    'ticket_type_name' => $ticket->ticket_type_name,
                     'ticket_price' => $ticket->ticket_price
                 ], $ticket_transaction,);
             }
@@ -63,8 +65,7 @@ class TransactionController extends Controller
                 'message' => 'Transaction success'
             ];
 
-
-            // DB::commit();
+            DB::commit();
 
             return response()->json($data);
         } catch (\Throwable $th) {

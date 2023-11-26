@@ -35,13 +35,13 @@ class Ticket extends Model
         return $this->belongsTo(TransactionDetail::class, 'transaction_detail_id');
     }
 
-    protected function getTicketTypeNameAttribute(): string
+    protected function getTicketTypeNameAttribute(): string | null
     {
-        return $this->transactionDetail->ticket_type_name;
+        return $this->transactionDetail ? $this->transactionDetail->ticket_type_name : null;
     }
 
-    protected function getTicketPriceAttribute(): string
+    protected function getTicketPriceAttribute(): float | null
     {
-        return $this->transactionDetail->price;
+        return $this->transactionDetail ? $this->transactionDetail->price : null;
     }
 }

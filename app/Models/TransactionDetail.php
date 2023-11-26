@@ -26,6 +26,16 @@ class TransactionDetail extends Model
     ];
 
     /**
+     * Get the transaction that owns the TransactionDetail
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function transaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class, 'transaction_id');
+    }
+
+    /**
      * Get the type that owns the TransactionDetail
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

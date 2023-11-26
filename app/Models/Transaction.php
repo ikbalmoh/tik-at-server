@@ -23,6 +23,10 @@ class Transaction extends Model
         'gate'
     ];
 
+    protected $casts = [
+        'is_group' => 'boolean'
+    ];
+
     /**
      * Get the operator that owns the Transaction
      *
