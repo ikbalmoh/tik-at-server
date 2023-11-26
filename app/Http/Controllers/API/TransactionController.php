@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransaction;
 use App\Models\Ticket;
 use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -16,49 +17,60 @@ class TransactionController extends Controller
         DB::beginTransaction();
         try {
             $user = $request->user();
-            $payload = $request->only([
-                'type_id',
+            $trx_payload = $request->only([
                 'is_group',
-                'qty',
-                'price',
-                'subtotal',
-                'discount',
-                'total',
+                'grand_total',
                 'pay',
                 'charge',
-                'payment_method'
+                'payment_method',
+                'payment_ref',
             ]);
-            $payload['operator_id'] = $user->id;
+            $trx_payload['user_id'] = $user->id;
 
-            $transaction = Transaction::create($payload);
+            $transaction = Transaction::create($trx_payload);
 
-            $data_tickets = [];
-
-            $total_ticket = $transaction->is_group ? 1 : $transaction->qty;
-            $entrance_max = $transaction->is_group ? $transaction->qty : 1;
-            for ($i = 0; $i < $total_ticket; $i++) {
-                $data_tickets[] = new Ticket(
-                    [
-                        'entrance_max' => $entrance_max,
-                    ]
-                );
+            $trx_payload_details = [];
+            foreach ($request->tickets as $key => $t) {
+                $trx_payload_details[] = new TransactionDetail($t);
             }
 
-            $tickets = $transaction->tickets()->saveMany($data_tickets);
+            $transaction->details()->saveMany($trx_payload_details);
+
+            foreach ($transaction->details as $key => $detail) {
+                $data_tickets = [];
+                for ($i = 0; $i < $detail->qty; $i++) {
+                    $data_tickets[] = new Ticket();
+                }
+                $detail->tickets()->saveMany($data_tickets);
+            }
+
+            $ticket_transaction = [
+                'is_group' => $transaction->is_group,
+                'datetime' => $transaction->created_at,
+            ];
+            foreach ($transaction->tickets as $key => $ticket) {
+                $tickets[] = array_merge([
+                    'id' => $ticket->id,
+                    'expired_at' => $ticket->expired_at,
+                    'entrance_max' => $ticket->entrance_max,
+                    'ticket_type' => $ticket->ticket_type_name,
+                    'ticket_price' => $ticket->ticket_price
+                ], $ticket_transaction,);
+            }
 
             $data = [
-                'transaction' => $transaction,
                 'tickets' => $tickets,
-                'message' => 'Ticket published'
+                'message' => 'Transaction success'
             ];
 
-            DB::commit();
+
+            // DB::commit();
 
             return response()->json($data);
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json([
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ]);
         }
     }

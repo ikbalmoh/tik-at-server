@@ -5,17 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ticket extends Model
 {
     use HasUlids, HasFactory;
 
     protected $fillable = [
-        'uid',
-        'transaction_id',
+        'transaction_detail_id',
         'entrance_max',
         'entrance_count',
-        'expired_at'
+        'entrance_gate',
+        'entrance_door',
+        'expires_at'
+    ];
+
+    protected $appends = [
+        'ticket_type_name',
+        'ticket_price'
     ];
 
     /**
@@ -23,8 +30,18 @@ class Ticket extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function transaction(): BelongsTo
+    public function transactionDetail(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class, 'transaction_id');
+        return $this->belongsTo(TransactionDetail::class, 'transaction_detail_id');
+    }
+
+    protected function getTicketTypeNameAttribute(): string
+    {
+        return $this->transactionDetail->ticket_type_name;
+    }
+
+    protected function getTicketPriceAttribute(): string
+    {
+        return $this->transactionDetail->price;
     }
 }

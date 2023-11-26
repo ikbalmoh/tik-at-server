@@ -12,23 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('type_id');
-            $table->unsignedBigInteger('operator_id');
-            $table->smallInteger('qty')->default(1);
+            $table->uuid('id')->primary();
+            $table->unsignedBigInteger('user_id');
             $table->boolean('is_group')->default(false);
-            $table->double('price');
-            $table->double('subtotal');
-            $table->double('discount')->default(0);
-            $table->double('total');
+            $table->double('grand_total');
             $table->double('pay');
             $table->double('charge')->default(0);
             $table->string('payment_method')->default('cash');
+            $table->string('payment_ref')->nullable();
             $table->string('gate', 10)->default('1');
             $table->timestamps();
 
-            $table->foreign('type_id')->references('id')->on('ticket_types');
-            $table->foreign('operator_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

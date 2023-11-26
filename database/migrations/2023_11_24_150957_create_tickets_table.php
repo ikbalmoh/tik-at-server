@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->ulid('id');
-            $table->unsignedBigInteger('transaction_id');
+            $table->unsignedBigInteger('transaction_detail_id');
             $table->tinyInteger('entrance_max')->default(1);
             $table->tinyInteger('entrance_count')->default(0);
-            $table->timestamp('expired_at')->nullable();
+            $table->string('entrance_gate', 10)->nullable()->default('1');
+            $table->string('entrance_door', 10)->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTransaction extends FormRequest
 {
@@ -22,16 +24,23 @@ class StoreTransaction extends FormRequest
     public function rules(): array
     {
         return [
-            'type_id' => 'required',
             'is_group' => 'required',
-            'qty' => 'required',
-            'price' => 'required',
-            'subtotal' => 'required',
-            'discount' => 'required',
-            'total' => 'required',
+            'grand_total' => 'required',
             'pay' => 'required',
             'charge' => 'required',
-            'payment_method' => 'required'
+            'payment_method' => 'required',
+            'tickets' => 'required',
+            'tickets.*.ticket_type_id' => [
+                'required',
+                Rule::exists('ticket_types', 'id')->where(function (Builder $query) {
+                    $query->where('is_active', 1);
+                })
+            ],
+            'tickets.*.qty' => 'required',
+            'tickets.*.price' => 'required',
+            'tickets.*.subtotal' => 'required',
+            'tickets.*.discount' => 'required',
+            'tickets.*.total' => 'required',
         ];
     }
 }
