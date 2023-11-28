@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('ticket')->group(function () {
         Route::get('/types', [TicketController::class, 'types']);
         Route::get('/{id}', [TicketController::class, 'show']);
-        Route::post('/{id}', [TicketController::class, 'entrance']);
     });
 });
+
+Route::post('/ticket/{id}', [TicketController::class, 'entrance']);
