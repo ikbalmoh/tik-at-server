@@ -17,6 +17,10 @@ use App\Http\Controllers\API\TransactionController;
 |
 */
 
+Route::get('/ping', function () {
+    return response()->json(['message' => 'Welcome to tik@ API']);
+});
+
 Route::post('/auth/operator', [AuthController::class, 'authOperator']);
 
 Route::middleware('auth:sanctum')->group(function () {
