@@ -48,6 +48,7 @@ class TransactionController extends Controller
                 'is_group' => $transaction->is_group,
                 'purchase_date' => $transaction->created_at,
                 'gate' => $transaction->gate,
+                'operator_name' => $transaction->operator->name,
             ];
             foreach ($transaction->tickets as $key => $ticket) {
                 $tickets[] = array_merge([

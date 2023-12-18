@@ -38,6 +38,7 @@ class TicketController extends Controller
             'purchase_date' => $ticket->transactionDetail->transaction->created_at,
             'is_group' => $ticket->transactionDetail->transaction->is_group,
             'gate' => $ticket->transactionDetail->transaction->gate,
+            'operator_name' => $ticket->transactionDetail->transaction->operator->name,
         ];
 
         $data['message'] = 'Tiket ditemukan';
