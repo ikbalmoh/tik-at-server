@@ -15,7 +15,7 @@ const filters: { [key: string]: string } = {
     day: "Hari Ini",
     week: "7 Hari",
     month: "1 Bulan",
-    year: "1 Tahun",
+    year: "Tahun Ini",
 };
 
 export default function SalesSummary({ sales }: { sales: sales }) {
@@ -25,9 +25,9 @@ export default function SalesSummary({ sales }: { sales: sales }) {
 
     return (
         <>
-            <div className="flex space-between items-center w-full mb-8">
+            <div className="flex justify-between items-center w-full mb-5">
                 <h2 className="text-2xl font-medium text-gray-700 flex-1">
-                    Penjualan Tiket
+                    Jumlah Pengunjung
                 </h2>
                 <div className="flex items-center">
                     {Object.keys(filters).map((key) => (
@@ -45,10 +45,10 @@ export default function SalesSummary({ sales }: { sales: sales }) {
                             {filters[key]}
                         </button>
                     ))}
+                    <button onClick={reload} type="button" className="ml-3">
+                        <IconRefresh className="h-4" />
+                    </button>
                 </div>
-                <button onClick={reload} type="button" className="ml-3">
-                    <IconRefresh className="h-4" />
-                </button>
             </div>
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-3">

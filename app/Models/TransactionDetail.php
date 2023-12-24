@@ -57,6 +57,6 @@ class TransactionDetail extends Model
 
     protected function getTicketTypeNameAttribute(): string
     {
-        return $this->ticketType->name;
+        return $this->ticketType ? $this->ticketType->name : '';
     }
 }
