@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+table.app-table {
+    @apply table w-full;
+}
+
+table.app-table > thead > tr > th {
+    @apply border-b border-gray-200 text-left py-2 px-4 bg-white;
+}
+
+table.app-table > tbody > tr > td {
+    @apply text-left py-2 px-4 bg-white transition-colors duration-200;
+}
+
+table.app-table.app-table-striped > tbody > tr:nth-child(odd) > td {
+    @apply bg-gray-50;
+}
+
+table.app-table.app-table-striped > tbody > tr:nth-child(odd):hover > td,
+table.app-table.app-table-hover > tbody > tr:hover > td {
+    @apply bg-gray-100 text-indigo-600 transition-all;
+}
+
+table.nowrap > tbody > tr > td {
+    @apply whitespace-nowrap;
+}
+
+table.app-table > tbody > tr.danger > td,
+table.app-table > tbody > tr.danger:nth-child(odd) > td {
+    @apply bg-red-50;
+}

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Models\TicketType;
 
 class Transaction extends Model
 {
@@ -27,6 +28,8 @@ class Transaction extends Model
     protected $casts = [
         'is_group' => 'boolean'
     ];
+
+    protected $appends = ['operator_name', 'total_ticket'];
 
     /**
      * Get the operator that owns the Transaction
@@ -66,5 +69,22 @@ class Transaction extends Model
     public function tickets(): HasManyThrough
     {
         return $this->hasManyThrough(Ticket::class, TransactionDetail::class, 'transaction_id', 'transaction_detail_id', 'id', 'id');
+    }
+
+    protected function getOperatorNameAttribute()
+    {
+        return $this->operator ? $this->operator->name : '';
+    }
+
+    protected function getTotalTicketAttribute()
+    {
+        $total = [
+            'all' => (int) $this->details()->sum('qty'),
+        ];
+        $types = TicketType::pluck('id');
+        foreach ($types as $id) {
+            $total[$id] = (int)  $this->details()->where('ticket_type_id', $id)->sum('qty');
+        }
+        return $total;
     }
 }
