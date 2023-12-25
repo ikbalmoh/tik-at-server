@@ -23,6 +23,15 @@ class ReportController extends Controller
 
     public function daily(): Response
     {
-        return Inertia::render('Report/Daily', []);
+        return Inertia::render('Report/Daily', [
+            'transactions' => Transaction::select('id')
+                ->selectRaw('
+                    DATE_FORMAT(created_at, "%d/%m/%Y") as date,
+                    SUM(grand_total) as grand_total
+                ')
+                ->groupBy('date')
+                ->orderByDesc('created_at')
+                ->paginate()
+        ]);
     }
 }

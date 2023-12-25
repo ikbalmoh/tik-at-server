@@ -1,1 +1,0 @@
-import{j as t,a}from"./app-15cd4be6.js";import{A as i}from"./AppLayout-17dcee34.js";import"./ApplicationLogo-07c0ff6b.js";import"./ResponsiveNavLink-ab299648.js";import"./transition-fd6182aa.js";function l({auth:r,transaction:s}){return t.jsx(i,{title:"Laporan Transaksi",user:r==null?void 0:r.user,children:t.jsx(a,{title:"Laporan Transaksi"})})}export{l as default};
