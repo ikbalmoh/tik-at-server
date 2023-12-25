@@ -60,8 +60,7 @@ class DashboardController extends Controller
 
         $data->select('ticket_type_id')
             ->selectRaw('DATE_FORMAT(created_at, "' . $dateFormat . '") as date, SUM(qty) as total')
-            ->groupBy('date')
-            ->orderByDesc('created_at');
+            ->groupBy('date');
 
         return $data->pluck('total', 'date')->toArray();
     }
@@ -161,7 +160,7 @@ class DashboardController extends Controller
             'monthly' => [
                 [
                     'label' => "Semua",
-                    'data' => array_values($daily),
+                    'data' => array_values($monthly),
                     'backgroundColor' => "#66bb86",
                 ],
                 [

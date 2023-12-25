@@ -68,7 +68,7 @@ export default function VisitorChart({
                     </button>
                 </div>
             </div>
-            <div className="w-full bg-white p-5 rounded-lg">
+            <div className="w-full bg-white px-5 py-10 rounded-lg">
                 <Bar
                     data={data[filter]}
                     options={{
@@ -79,6 +79,11 @@ export default function VisitorChart({
                                     text: "jumlah pengunjung",
                                 },
                                 beginAtZero: true,
+                            },
+                            x: {
+                                grid: {
+                                    display: false,
+                                },
                             },
                         },
                         plugins: {
