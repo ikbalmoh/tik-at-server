@@ -1,13 +1,13 @@
 import AppLayout from "@/Layouts/AppLayout";
 import { Head } from "@inertiajs/react";
 import { PageProps } from "@/types";
-import { sales } from "@/types/app";
+import { Sales } from "@/types/app";
 import SalesSummary from "./SalesSummary";
 import VisitorChart from "./VisitorChart";
 import { ChartData } from "chart.js";
 
 interface Props extends PageProps {
-    sales: sales;
+    sales: Sales;
     chart: { [key: string]: ChartData<"bar", number, string> };
 }
 

@@ -1,4 +1,4 @@
-import { sales } from "@/types/app";
+import { Sales } from "@/types/app";
 import cls from "@/utils/cls";
 import { useState } from "react";
 import {
@@ -18,7 +18,7 @@ const filters: { [key: string]: string } = {
     year: "Tahun Ini",
 };
 
-export default function SalesSummary({ sales }: { sales: sales }) {
+export default function SalesSummary({ sales }: { sales: Sales }) {
     const [filter, setFilter] = useState<string>("day");
 
     const reload = () => router.reload({ only: ["sales"] });
