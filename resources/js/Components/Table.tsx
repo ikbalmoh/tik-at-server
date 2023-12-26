@@ -65,7 +65,7 @@ export default function Table({
                                 <td className="text-center">
                                     {pagination
                                         ? pagination.from + index
-                                        : index}
+                                        : index + 1}
                                 </td>
                                 {column.map((col, cellIndex) => {
                                     const value =

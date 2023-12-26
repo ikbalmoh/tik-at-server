@@ -22,10 +22,16 @@ class TicketType extends Model
         'updated_at'
     ];
 
-    protected $appends = ['price'];
+    protected $appends = ['price', 'can_delete'];
 
-    protected function getPriceAttribute(): float
+    protected function getPriceAttribute(): float | null
     {
-        return $this->regular_price;
+        $weekDay = date('w', time());
+        return ($weekDay == 0 || $weekDay == 6) ? $this->holiday_price : $this->regular_price;
+    }
+
+    protected function getCanDeleteAttribute(): bool
+    {
+        return $this->id > 3;
     }
 }

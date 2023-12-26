@@ -1,5 +1,15 @@
 export type Sales = { [key: string]: { [key: string]: number } };
 
+export interface Ticket {
+    id: number;
+    name: string;
+    description: string;
+    regular_price: number;
+    holiday_price: number;
+    is_active: boolean;
+    can_delete: boolean;
+}
+
 export interface Transaction {
     id: string;
     user_id: number;
