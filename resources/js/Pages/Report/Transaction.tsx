@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PageProps, TableColumn, Pagination } from "@/types";
 import { Transaction as TransactionProp } from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import Table from "@/Components/Table";
 import { currency } from "@/utils/formater";
 import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
@@ -13,6 +13,10 @@ interface TransactionData extends Pagination {
 
 interface Props extends PageProps {
     transactions: TransactionData;
+    dates: {
+        from: string | null;
+        to: string | null;
+    };
 }
 
 const column: TableColumn = [
@@ -48,9 +52,11 @@ const column: TableColumn = [
 export default function Transaction({ auth, transactions }: Props) {
     const { data, ...pagination } = transactions;
 
+    const { from, to } = usePage<Props>().props.dates;
+
     const [dates, setDates] = useState<DateValueType>({
-        startDate: null,
-        endDate: null,
+        startDate: from,
+        endDate: to,
     });
 
     const handleDatesChange = (newDates: DateValueType) => {
