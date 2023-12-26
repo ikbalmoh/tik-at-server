@@ -108,16 +108,12 @@ export default function Authenticated({
 
                                             <Dropdown.Content>
                                                 <Dropdown.Link
-                                                    href={route(
-                                                        "setting.ticket"
-                                                    )}
+                                                    href={route("ticket.index")}
                                                 >
                                                     Jenis Tiket
                                                 </Dropdown.Link>
                                                 <Dropdown.Link
-                                                    href={route(
-                                                        "setting.users"
-                                                    )}
+                                                    href={route("users.index")}
                                                 >
                                                     Operator
                                                 </Dropdown.Link>

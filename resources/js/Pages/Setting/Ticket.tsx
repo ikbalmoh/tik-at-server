@@ -31,14 +31,11 @@ export default function Ticket({ auth, tickets }: Props) {
     };
 
     const onDeleteTicket = () => {
-        router.delete(
-            route("setting.destroy_ticket", { id: deleteTicket?.id }),
-            {
-                onSuccess: () => {
-                    setDeleteTicket(undefined);
-                },
-            }
-        );
+        router.delete(route("ticket.destroy", { id: deleteTicket?.id }), {
+            onSuccess: () => {
+                setDeleteTicket(undefined);
+            },
+        });
     };
 
     const column: TableColumn = [

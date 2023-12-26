@@ -26,12 +26,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/setting/ticket', [SettingController::class, 'ticket'])->name('setting.ticket');
-    Route::post('/setting/ticket', [SettingController::class, 'storeTicket'])->name('setting.store_ticket');
-    Route::put('/setting/ticket/{id}', [SettingController::class, 'updateTicket'])->name('setting.update_ticket');
-    Route::delete('/setting/ticket/{id}', [SettingController::class, 'destroyTicket'])->name('setting.destroy_ticket');
+    Route::prefix('setting')->group(function () {
+        Route::get('/ticket', [SettingController::class, 'ticket'])->name('ticket.index');
+        Route::post('/ticket', [SettingController::class, 'storeTicket'])->name('ticket.store');
+        Route::put('/ticket/{id}', [SettingController::class, 'updateTicket'])->name('ticket.update');
+        Route::delete('/ticket/{id}', [SettingController::class, 'destroyTicket'])->name('ticket.destroy');
 
-    Route::get('/setting/users', [SettingController::class, 'users'])->name('setting.users');
+        Route::get('/users', [SettingController::class, 'users'])->name('users.index');
+    });
 });
 
 require __DIR__ . '/auth.php';

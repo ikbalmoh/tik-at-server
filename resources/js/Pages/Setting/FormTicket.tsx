@@ -39,11 +39,11 @@ export default function FormTicket({
         e.preventDefault();
 
         if (ticket) {
-            put(route("setting.update_ticket", { id: ticket.id }), {
+            put(route("ticket.update", { id: ticket.id }), {
                 onSuccess: () => onSubmited(),
             });
         } else {
-            post(route("setting.store_ticket"), {
+            post(route("ticket.store"), {
                 onSuccess: () => onSubmited(),
             });
         }
