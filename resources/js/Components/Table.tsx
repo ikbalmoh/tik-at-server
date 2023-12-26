@@ -1,6 +1,7 @@
 import Pagination from "./Pagination";
 import cls from "@/utils/cls";
 import { Pagination as PaginationProp, TableColumn } from "@/types";
+import { IconClipboardOff, IconMoodEmpty } from "@tabler/icons-react";
 
 interface TableProps {
     data: Array<any>;
@@ -15,7 +16,7 @@ export default function Table({
     data,
     pagination,
     column,
-    className,
+    className = "",
     onClickRow = undefined,
     markKey,
 }: TableProps) {
@@ -31,9 +32,15 @@ export default function Table({
                 >
                     <thead>
                         <tr>
-                            <th>No.</th>
+                            <th className="text-center">No.</th>
                             {column.map((col, headIndex) => (
-                                <th key={"header-" + headIndex}>
+                                <th
+                                    key={"header-" + headIndex}
+                                    className={cls(
+                                        "text-left",
+                                        col.className ? col.className : ""
+                                    )}
+                                >
                                     {col.header}
                                 </th>
                             ))}
@@ -55,7 +62,7 @@ export default function Table({
                                     onClickRow ? onClickRow(dt) : null
                                 }
                             >
-                                <td>
+                                <td className="text-center">
                                     {pagination
                                         ? pagination.from + index
                                         : index}
@@ -73,7 +80,7 @@ export default function Table({
                                                 "-" +
                                                 cellIndex
                                             }
-                                            className={"text-right"}
+                                            className={col.className}
                                         >
                                             {value}
                                         </td>
@@ -81,6 +88,18 @@ export default function Table({
                                 })}
                             </tr>
                         ))}
+                        {data.length == 0 ? (
+                            <tr>
+                                <td colSpan={column.length + 1}>
+                                    <div className="px-10 py-20 text-center text-gray-500 flex flex-col items-center">
+                                        <IconClipboardOff size={"3rem"} />
+                                        <span className="mt-5">
+                                            Tidak ada data
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : null}
                     </tbody>
                 </table>
             </div>

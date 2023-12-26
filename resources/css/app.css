@@ -7,11 +7,11 @@ table.app-table {
 }
 
 table.app-table > thead > tr > th {
-    @apply border-b border-gray-200 text-left py-2 px-4 bg-white;
+    @apply border-b border-gray-200 py-2 px-4 bg-white;
 }
 
 table.app-table > tbody > tr > td {
-    @apply text-left py-2 px-4 bg-white transition-colors duration-200;
+    @apply py-2 px-4 bg-white transition-colors duration-200;
 }
 
 table.app-table.app-table-striped > tbody > tr:nth-child(odd) > td {
