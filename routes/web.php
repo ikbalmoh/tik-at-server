@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/ticket/{id}', [SettingController::class, 'updateTicket'])->name('ticket.update');
         Route::delete('/ticket/{id}', [SettingController::class, 'destroyTicket'])->name('ticket.destroy');
 
-        Route::get('/users', [SettingController::class, 'users'])->name('users.index');
+        Route::get('/operators', [SettingController::class, 'operators'])->name('operator.index');
     });
 });
 

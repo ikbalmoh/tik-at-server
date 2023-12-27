@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TicketType;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,10 +18,10 @@ class SettingController extends Controller
         ]);
     }
 
-    public function users(): Response
+    public function operators(): Response
     {
-        return Inertia::render('Setting/Ticket', [
-            'tickets' => TicketType::all()
+        return Inertia::render('Setting/Users', [
+            'users' => User::all()
         ]);
     }
 

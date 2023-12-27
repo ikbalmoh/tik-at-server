@@ -113,9 +113,11 @@ export default function Authenticated({
                                                     Jenis Tiket
                                                 </Dropdown.Link>
                                                 <Dropdown.Link
-                                                    href={route("users.index")}
+                                                    href={route(
+                                                        "operator.index"
+                                                    )}
                                                 >
-                                                    Operator
+                                                    Operator Loket
                                                 </Dropdown.Link>
                                             </Dropdown.Content>
                                         </Dropdown>
