@@ -43,8 +43,8 @@ export default function VisitorChart({
 
     return (
         <>
-            <div className="flex justify-between items-center w-full mb-8">
-                <h2 className="text-2xl font-medium text-gray-700 flex-1">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-8">
+                <h2 className="text-2xl font-medium text-gray-700 flex-1 mb-2 md:mb-0">
                     Statistik Pengunjung
                 </h2>
                 <div className="flex items-center">
@@ -63,36 +63,42 @@ export default function VisitorChart({
                             {filters[key]}
                         </button>
                     ))}
-                    <button onClick={reload} type="button" className="ml-3">
+                    <button
+                        onClick={reload}
+                        type="button"
+                        className="ml-auto md:ml-3"
+                    >
                         <IconRefresh className="h-4" />
                     </button>
                 </div>
             </div>
-            <div className="w-full bg-white px-5 py-10 rounded-lg">
-                <Bar
-                    data={data[filter]}
-                    options={{
-                        scales: {
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: "jumlah pengunjung",
+            <div className=" bg-white px-5 py-10 rounded-lg overflow-auto">
+                <div className="w-[200%] md:w-full">
+                    <Bar
+                        data={data[filter]}
+                        options={{
+                            scales: {
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: "jumlah pengunjung",
+                                    },
+                                    beginAtZero: true,
                                 },
-                                beginAtZero: true,
-                            },
-                            x: {
-                                grid: {
-                                    display: false,
+                                x: {
+                                    grid: {
+                                        display: false,
+                                    },
                                 },
                             },
-                        },
-                        plugins: {
-                            legend: {
-                                position: "bottom",
+                            plugins: {
+                                legend: {
+                                    position: "bottom",
+                                },
                             },
-                        },
-                    }}
-                />
+                        }}
+                    />
+                </div>
             </div>
         </>
     );

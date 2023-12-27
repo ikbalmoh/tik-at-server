@@ -17,7 +17,7 @@ export default function Dashboard({ auth, sales, chart }: Props) {
             <Head title="Dashboard" />
 
             <div className="py-10">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
                     <SalesSummary sales={sales} />
                     <div className="h-12"></div>
                     <VisitorChart data={chart} />
