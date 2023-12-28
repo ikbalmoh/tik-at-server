@@ -20,6 +20,12 @@ export interface Transaction {
     operator: Operator;
 }
 
+export interface TransactionDetail {
+    id: string;
+    total: number;
+    qty: string;
+}
+
 export interface Operator {
     id: number;
     name: string;

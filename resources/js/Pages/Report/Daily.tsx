@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageProps, TableColumn, Pagination } from "@/types";
-import { Summary, Transaction as TransactionProp } from "@/types/app";
+import { Summary, TransactionDetail } from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Table";
@@ -25,27 +25,12 @@ const column: TableColumn = [
     { header: "Tanggal", value: "date" },
     {
         header: "Jumlah Tiket",
-        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Dewasa",
-        value: (t: TransactionProp) => t?.total_ticket[1] ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Anak-anak",
-        value: (t: TransactionProp) => t?.total_ticket[2] ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Mancanegara",
-        value: (t: TransactionProp) => t?.total_ticket[3] ?? "0",
+        value: (t: TransactionDetail) => t?.qty ?? "0",
         className: "text-center",
     },
     {
         header: "Total",
-        value: (t: TransactionProp) => currency(t.grand_total),
+        value: (t: TransactionDetail) => currency(t.total),
         className: "text-right font-medium",
     },
 ];

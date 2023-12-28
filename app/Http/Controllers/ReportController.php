@@ -83,10 +83,11 @@ class ReportController extends Controller
 
     private function getDailyTransactions(string | null $from, string | null $to = ''): LengthAwarePaginator
     {
-        $transactions = Transaction::select('id')
+        $transactions = TransactionDetail::select('id')
             ->selectRaw('
+            SUM(qty) as qty,
             DATE_FORMAT(created_at, "%d/%m/%Y") as date,
-            SUM(grand_total) as grand_total
+            SUM(total) as total
         ');
 
         if ($from) {
