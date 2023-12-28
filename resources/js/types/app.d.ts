@@ -33,3 +33,10 @@ export interface TotalTicket {
     "2": string;
     "3": number;
 }
+
+export interface Summary {
+    qty: number;
+    total: number;
+    from?: string;
+    to?: string;
+}

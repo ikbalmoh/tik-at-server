@@ -44,7 +44,7 @@ export default function VisitorChart({
     return (
         <>
             <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-8">
-                <h2 className="text-2xl font-medium text-gray-700 flex-1 mb-2 md:mb-0">
+                <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1 mb-2 md:mb-0">
                     Statistik Pengunjung
                 </h2>
                 <div className="flex items-center">
@@ -72,7 +72,7 @@ export default function VisitorChart({
                     </button>
                 </div>
             </div>
-            <div className=" bg-white px-5 py-10 rounded-lg overflow-auto">
+            <div className=" bg-white px-5 py-10 rounded-lg overflow-auto shadow">
                 <div className="w-[200%] md:w-full">
                     <Bar
                         data={data[filter]}

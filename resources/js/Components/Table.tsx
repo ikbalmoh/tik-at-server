@@ -22,7 +22,7 @@ export default function Table({
 }: TableProps) {
     return (
         <>
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto shadow rounded-lg">
                 <table
                     className={cls(
                         "app-table app-table-striped w-full",

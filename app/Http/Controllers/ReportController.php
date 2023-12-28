@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,8 @@ class ReportController extends Controller
             'dates' => [
                 'from' => $request->from,
                 'to' => $request->to,
-            ]
+            ],
+            'summary' => $this->getTransactionSummary($request->from, $request->to)
         ]);
     }
 
@@ -29,7 +31,8 @@ class ReportController extends Controller
             'dates' => [
                 'from' => $request->from,
                 'to' => $request->to,
-            ]
+            ],
+            'summary' => $this->getTransactionSummary($request->from, $request->to)
         ]);
     }
 
@@ -50,6 +53,32 @@ class ReportController extends Controller
         return $transactions->orderByDesc('created_at')
             ->paginate()
             ->appends(['from' => $from, 'to' => $to]);
+    }
+
+    private function getTransactionSummary(string | null $from, string | null $to = ''): array
+    {
+        $transactions = TransactionDetail::selectRaw('
+                SUM(qty) as qty,
+                SUM(total) as total,
+                MAX(created_at) as date_to,
+                MIN(created_at) as date_from
+            ');
+
+        if ($from) {
+            $transactions->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $transactions->whereDate('created_at', '<=', $to);
+        }
+
+        $sum = $transactions->first();
+
+        return [
+            'qty' => $sum->qty,
+            'total' => $sum->total,
+            'from' => date('d/m/Y', strtotime($sum->date_from)),
+            'to' => date('d/m/Y', strtotime($sum->date_to)),
+        ];
     }
 
     private function getDailyTransactions(string | null $from, string | null $to = ''): LengthAwarePaginator

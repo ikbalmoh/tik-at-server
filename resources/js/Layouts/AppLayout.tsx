@@ -78,7 +78,7 @@ export default function Authenticated({
                                                 <Dropdown.Link
                                                     href={route("report.daily")}
                                                 >
-                                                    Laporan Harian
+                                                    Rekap Harian
                                                 </Dropdown.Link>
                                             </Dropdown.Content>
                                         </Dropdown>
@@ -235,6 +235,18 @@ export default function Authenticated({
                             active={route().current("dashboard")}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("report.transaction")}
+                            active={route().current("report.transaction")}
+                        >
+                            Laporan Transaksi
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route("report.daily")}
+                            active={route().current("report.daily")}
+                        >
+                            Rekap Harian
                         </ResponsiveNavLink>
                     </div>
 
