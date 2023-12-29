@@ -24,6 +24,7 @@ class TransactionController extends Controller
                 'charge',
                 'payment_method',
                 'payment_ref',
+                'purchase_date'
             ]);
             $trx_payload['user_id'] = $user->id;
 
@@ -46,7 +47,7 @@ class TransactionController extends Controller
 
             $ticket_transaction = [
                 'is_group' => $transaction->is_group,
-                'purchase_date' => $transaction->created_at,
+                'purchase_date' => $transaction->purchase_date,
                 'gate' => $transaction->gate,
                 'operator_name' => $transaction->operator->name,
             ];

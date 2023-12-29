@@ -22,7 +22,8 @@ class Transaction extends Model
         'charge',
         'payment_method',
         'payment_ref',
-        'gate'
+        'gate',
+        'purchase_date'
     ];
 
     protected $casts = [

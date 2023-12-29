@@ -35,7 +35,7 @@ class TicketController extends Controller
             'expires_at' => $ticket->expires_at,
             'ticket_type_name' => $ticket->ticket_type_name,
             'ticket_price' => $ticket->ticket_price,
-            'purchase_date' => $ticket->transactionDetail->transaction->created_at,
+            'purchase_date' => $ticket->transactionDetail->transaction->purchase_date,
             'is_group' => $ticket->transactionDetail->transaction->is_group,
             'gate' => $ticket->transactionDetail->transaction->gate,
             'operator_name' => $ticket->transactionDetail->transaction->operator->name,
