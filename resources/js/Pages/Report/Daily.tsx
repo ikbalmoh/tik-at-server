@@ -72,9 +72,21 @@ export default function Daily({
                             <Datepicker
                                 value={dates}
                                 onChange={handleDatesChange}
-                                maxDate={new Date()}
                                 placeholder="Filter Tanggal"
                                 i18n="id"
+                                readOnly={true}
+                                showShortcuts
+                                displayFormat="DD MMM"
+                                startWeekOn="mon"
+                                configs={{
+                                    shortcuts: {
+                                        today: "Hari Ini",
+                                        yesterday: "Kemarin",
+                                        past: period => `${period}  hari terakhir`,
+                                        currentMonth: "Bulan Ini",
+                                        pastMonth: "Bulan Kemarin" 
+                                    },
+                                }}
                             />
                         </div>
                     </div>

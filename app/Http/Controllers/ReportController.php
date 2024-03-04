@@ -14,25 +14,31 @@ class ReportController extends Controller
 {
     public function transaction(Request $request): Response
     {
+        $from = !empty($request->from) ? $request->from : date('Y-m-').'01';
+        $to = !empty($request->to) ? $request->to : date('Y-m-t');
+        
         return Inertia::render('Report/Transaction', [
-            'transactions' => $this->getTransactions($request->from, $request->to),
+            'transactions' => $this->getTransactions($from, $to),
             'dates' => [
-                'from' => $request->from,
-                'to' => $request->to,
+                'from' => $from,
+                'to' => $to,
             ],
-            'summary' => $this->getTransactionSummary($request->from, $request->to)
+            'summary' => $this->getTransactionSummary($from, $to)
         ]);
     }
 
     public function daily(Request $request): Response
     {
+        $from = !empty($request->from) ? $request->from : date('Y-m-').'01';
+        $to = !empty($request->to) ? $request->to : date('Y-m-t');
+
         return Inertia::render('Report/Daily', [
-            'transactions' => $this->getDailyTransactions($request->from, $request->to),
+            'transactions' => $this->getDailyTransactions($from, $to),
             'dates' => [
-                'from' => $request->from,
-                'to' => $request->to,
+                'from' => $from,
+                'to' => $to,
             ],
-            'summary' => $this->getTransactionSummary($request->from, $request->to)
+            'summary' => $this->getTransactionSummary($from, $to)
         ]);
     }
 
@@ -76,8 +82,8 @@ class ReportController extends Controller
         return [
             'qty' => $sum->qty,
             'total' => $sum->total,
-            'from' => date('d/m/Y', strtotime($sum->date_from)),
-            'to' => date('d/m/Y', strtotime($sum->date_to)),
+            'from' => date('d M Y', strtotime($from ?? $sum->date_from)),
+            'to' => date('d M Y', strtotime($to ?? $sum->date_to)),
         ];
     }
 

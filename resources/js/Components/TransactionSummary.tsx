@@ -8,7 +8,7 @@ export default function TransactionSummary({ summary }: { summary: Summary }) {
             <div className="col-span-12 md:col-span-4 p-5 flex flex-col items-center justify-center">
                 <div className="text-base text-gray-500">Periode</div>
                 <div className="text-lg font-bold">
-                    {summary.from} - {summary.to}
+                    {summary.from == summary.to ? summary.from : summary.from +'-'+ summary.to}
                 </div>
             </div>
             <div className="col-span-12 md:col-span-4 p-5 flex flex-col items-center justify-center border-t border-b md:border-t-0 md:border-b-0 md:border-l md:border-r border-gray5100 border-dashed">
