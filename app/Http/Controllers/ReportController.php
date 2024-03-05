@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TicketType;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Traits\TransactionTrait;
 
 class ReportController extends Controller
 {
+    use TransactionTrait;
+
     public function transaction(Request $request): Response
     {
         $from = !empty($request->from) ? $request->from : date('Y-m-').'01';
@@ -23,7 +28,8 @@ class ReportController extends Controller
                 'from' => $from,
                 'to' => $to,
             ],
-            'summary' => $this->getTransactionSummary($from, $to)
+            'summary' => $this->transactionSummary($from, $to),
+            'ticket_types' => TicketType::all()
         ]);
     }
 
@@ -33,12 +39,13 @@ class ReportController extends Controller
         $to = !empty($request->to) ? $request->to : date('Y-m-t');
 
         return Inertia::render('Report/Daily', [
-            'transactions' => $this->getDailyTransactions($from, $to),
+            'transactions' => $this->dailyTransactions($from, $to),
             'dates' => [
                 'from' => $from,
                 'to' => $to,
             ],
-            'summary' => $this->getTransactionSummary($from, $to)
+            'summary' => $this->transactionSummary($from, $to),
+            'ticket_types' => TicketType::all()
         ]);
     }
 
@@ -61,51 +68,4 @@ class ReportController extends Controller
             ->appends(['from' => $from, 'to' => $to]);
     }
 
-    private function getTransactionSummary(string | null $from, string | null $to = ''): array
-    {
-        $transactions = TransactionDetail::selectRaw('
-                SUM(qty) as qty,
-                SUM(total) as total,
-                MAX(created_at) as date_to,
-                MIN(created_at) as date_from
-            ');
-
-        if ($from) {
-            $transactions->whereDate('created_at', '>=', $from);
-        }
-        if ($to) {
-            $transactions->whereDate('created_at', '<=', $to);
-        }
-
-        $sum = $transactions->first();
-
-        return [
-            'qty' => $sum->qty,
-            'total' => $sum->total,
-            'from' => date('d M Y', strtotime($from ?? $sum->date_from)),
-            'to' => date('d M Y', strtotime($to ?? $sum->date_to)),
-        ];
-    }
-
-    private function getDailyTransactions(string | null $from, string | null $to = ''): LengthAwarePaginator
-    {
-        $transactions = TransactionDetail::select('id')
-            ->selectRaw('
-            SUM(qty) as qty,
-            DATE_FORMAT(created_at, "%d/%m/%Y") as date,
-            SUM(total) as total
-        ');
-
-        if ($from) {
-            $transactions->whereDate('created_at', '>=', $from);
-        }
-        if ($to) {
-            $transactions->whereDate('created_at', '<=', $to);
-        }
-
-        return $transactions->groupBy('date')
-            ->orderByDesc('created_at')
-            ->paginate()
-            ->appends(['from' => $from, 'to' => $to]);
-    }
 }

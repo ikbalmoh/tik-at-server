@@ -1,47 +1,30 @@
 import { useState } from "react";
 import { PageProps, TableColumn, Pagination } from "@/types";
-import { Summary, TransactionDetail } from "@/types/app";
+import { Summary, TicketType, TransactionDetail } from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Table";
-import { currency } from "@/utils/formater";
+import { currency, number } from "@/utils/formater";
 import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
 import TransactionSummary from "@/Components/TransactionSummary";
 
-interface TransactionData extends Pagination {
-    data: Array<any>;
-}
-
 interface Props extends PageProps {
-    transactions: TransactionData;
+    transactions: Array<any>;
     dates: {
         from: string | null;
         to: string | null;
     };
     summary: Summary;
+    ticket_types: Array<TicketType>
 }
-
-const column: TableColumn = [
-    { header: "Tanggal", value: "date" },
-    {
-        header: "Jumlah Tiket",
-        value: (t: TransactionDetail) => t?.qty ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Total",
-        value: (t: TransactionDetail) => currency(t.total),
-        className: "text-right font-medium",
-    },
-];
 
 export default function Daily({
     auth,
     transactions,
     summary,
     dates: range,
+    ticket_types
 }: Props) {
-    const { data, ...pagination } = transactions;
 
     const { from, to } = range;
 
@@ -49,6 +32,21 @@ export default function Daily({
         startDate: from,
         endDate: to,
     });
+
+
+const [column] = useState<TableColumn>([
+    { header: "Tanggal", value: "date" },
+    ...ticket_types.map(type => ({
+        header: type.name,
+        value: (t: any) => number(t[type.id] ?? '0'),
+        className: "text-center",
+    })),
+    {
+        header: "Total",
+        value: (t: TransactionDetail) => currency(t.total),
+        className: "text-right font-medium",
+    },
+]);
 
     const handleDatesChange = (newDates: DateValueType) => {
         setDates(newDates);
@@ -95,8 +93,7 @@ export default function Daily({
                         <TransactionSummary summary={summary} />
                         <Table
                             column={column}
-                            data={data}
-                            pagination={pagination}
+                            data={transactions}
                             onClickRow={undefined}
                         />
                     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageProps, TableColumn, Pagination } from "@/types";
-import { Summary, Transaction as TransactionProp } from "@/types/app";
+import { Summary, TicketType, Transaction as TransactionProp } from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router, usePage } from "@inertiajs/react";
 import Table from "@/Components/Table";
@@ -19,43 +19,16 @@ interface Props extends PageProps {
         to: string | null;
     };
     summary: Summary;
+    ticket_types: Array<TicketType>;
 }
 
-const column: TableColumn = [
-    { header: "Waktu", value: "date" },
-    { header: "Kasir", value: "operator_name" },
-    {
-        header: "Jumlah Tiket",
-        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Dewasa",
-        value: (t: TransactionProp) => t?.total_ticket[1] ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Anak-anak",
-        value: (t: TransactionProp) => t?.total_ticket[2] ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Mancanegara",
-        value: (t: TransactionProp) => t?.total_ticket[3] ?? "0",
-        className: "text-center",
-    },
-    {
-        header: "Total",
-        value: (t: TransactionProp) => currency(t.grand_total),
-        className: "text-right font-bold",
-    },
-];
 
 export default function Transaction({
     auth,
     transactions,
     dates: range,
     summary,
+    ticket_types
 }: Props) {
     const { data, ...pagination } = transactions;
 
@@ -65,6 +38,27 @@ export default function Transaction({
         startDate: from,
         endDate: to,
     });
+
+
+const column: TableColumn = [
+    { header: "Waktu", value: "date" },
+    { header: "Kasir", value: "operator_name" },
+    {
+        header: "Jumlah Tiket",
+        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
+        className: "text-center",
+    },
+    ...ticket_types.map(type => ({
+        header: type.name,
+        value: (t: TransactionProp) => t?.total_ticket[type.id] ?? "0",
+        className: "text-center",
+    })),
+    {
+        header: "Total",
+        value: (t: TransactionProp) => currency(t.grand_total),
+        className: "text-right font-bold",
+    },
+];
 
     const handleDatesChange = (newDates: DateValueType) => {
         setDates(newDates);
@@ -79,7 +73,7 @@ export default function Transaction({
             <Head title="Laporan Transaksi" />
 
             <div className="py-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" px-4>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full mb-5">
                         <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1 mb-3 sm:mb-0">
                             Laporan Transaksi

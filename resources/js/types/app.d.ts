@@ -16,13 +16,15 @@ export interface Transaction {
     grand_total: number;
     date: string;
     operator_name: string;
-    total_ticket: TotalTicket;
+    total_ticket: any;
     operator: Operator;
 }
 
 export interface TransactionDetail {
     id: string;
     total: number;
+    ticket_type_id: number;
+    ticket_type_name: string;
     qty: string;
 }
 
@@ -31,6 +33,11 @@ export interface Operator {
     name: string;
     username: string;
     email: string;
+}
+
+export interface TicketType {
+    id: number;
+    name: string;
 }
 
 export interface TotalTicket {
