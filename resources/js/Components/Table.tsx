@@ -10,6 +10,7 @@ interface TableProps {
     onClickRow?: Function | undefined;
     markKey?: string;
     className?: string;
+    numbering?: boolean;
 }
 
 export default function Table({
@@ -19,6 +20,7 @@ export default function Table({
     className = "",
     onClickRow = undefined,
     markKey,
+    numbering = true
 }: TableProps) {
     return (
         <>
@@ -32,7 +34,7 @@ export default function Table({
                 >
                     <thead>
                         <tr>
-                            <th className="text-center">No.</th>
+                            { numbering ? <th className="text-center">No.</th> : null }
                             {column.map((col, headIndex) => (
                                 <th
                                     key={"header-" + headIndex}
@@ -62,11 +64,11 @@ export default function Table({
                                     onClickRow ? onClickRow(dt) : null
                                 }
                             >
-                                <td className="text-center">
+                                {numbering ? <td className="text-center">
                                     {pagination
                                         ? pagination.from + index
                                         : index + 1}
-                                </td>
+                                </td> : null }
                                 {column.map((col, cellIndex) => {
                                     const value =
                                         typeof col.value === "function"

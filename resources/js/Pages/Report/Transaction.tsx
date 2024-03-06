@@ -4,7 +4,7 @@ import { Summary, TicketType, Transaction as TransactionProp } from "@/types/app
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router, usePage } from "@inertiajs/react";
 import Table from "@/Components/Table";
-import { currency } from "@/utils/formater";
+import { currency, number } from "@/utils/formater";
 import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
 import TransactionSummary from "@/Components/TransactionSummary";
 
@@ -43,16 +43,16 @@ export default function Transaction({
 const column: TableColumn = [
     { header: "Waktu", value: "date" },
     { header: "Kasir", value: "operator_name" },
-    {
-        header: "Jumlah Tiket",
-        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
-        className: "text-center",
-    },
     ...ticket_types.map(type => ({
         header: type.name,
-        value: (t: TransactionProp) => t?.total_ticket[type.id] ?? "0",
+        value: (t: TransactionProp) => t?.total_ticket[type.id] ? number(t?.total_ticket[type.id]) : "-",
         className: "text-center",
     })),
+    {
+        header: "Jumlah",
+        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
+        className: "text-center font-bold",
+    },
     {
         header: "Total",
         value: (t: TransactionProp) => currency(t.grand_total),

@@ -13,7 +13,7 @@ import {
     IconSettings,
 } from "@tabler/icons-react";
 
-export default function Authenticated({
+export default function AppLayout({
     user,
     children,
     title,
@@ -78,7 +78,7 @@ export default function Authenticated({
                                                 <Dropdown.Link
                                                     href={route("report.daily")}
                                                 >
-                                                    Rekap Harian
+                                                    Rekap Bulanan
                                                 </Dropdown.Link>
                                             </Dropdown.Content>
                                         </Dropdown>
@@ -246,7 +246,7 @@ export default function Authenticated({
                             href={route("report.daily")}
                             active={route().current("report.daily")}
                         >
-                            Rekap Harian
+                            Rekap Bulanan
                         </ResponsiveNavLink>
                     </div>
 

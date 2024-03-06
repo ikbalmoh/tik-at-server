@@ -5,8 +5,28 @@ namespace App\Traits;
 use App\Models\Transaction;
 use App\Models\TicketType;
 use App\Models\TransactionDetail;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait TransactionTrait {
+    public function getTransactions(string | null $from, string | null $to = ''): LengthAwarePaginator
+    {
+        $transactions = Transaction::select('id', 'user_id', 'grand_total')
+            ->selectRaw('
+            DATE_FORMAT(created_at, "%d/%m/%Y %h:%i") as date
+        ');
+
+        if ($from) {
+            $transactions->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $transactions->whereDate('created_at', '<=', $to);
+        }
+
+        return $transactions->orderByDesc('created_at')
+            ->paginate()
+            ->appends(['from' => $from, 'to' => $to]);
+    }
+
   public function transactionSummary(string | null $from, string | null $to = ''): array
     {
         $transactions = TransactionDetail::selectRaw('
@@ -33,8 +53,10 @@ trait TransactionTrait {
         ];
     }
 
-  public function dailyTransactions(string $from, string $to): array
+  public function dailyTransactions(string $month, string $year): array
     {
+        $from = implode('-', [$year, $month, '01']);
+        $to = implode('-', [$year, $month, date('t')]);
         $period = new \DatePeriod(
             new \DateTime($from),
             new \DateInterval('P1D'),
@@ -46,8 +68,9 @@ trait TransactionTrait {
             SUM(qty) as qty,
             ticket_type_id,
             DATE_FORMAT(created_at, "%Y-%m-%d") as date,
+            DATE_FORMAT(created_at, "%d") as day,
             SUM(total) as total
-        ')->whereBetween('created_at', [$from, $to])
+        ')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->groupBy('date')->groupBy('ticket_type_id')
             ->get();
 
@@ -70,7 +93,8 @@ trait TransactionTrait {
         $data = [];
         foreach ($period as $key => $value) {
             $transaction = [
-                'date' => $value->format('d/m/Y'),
+                'date' => $value->format('Y-m-d'),
+                'day' => $value->format('j'),
                 'total' => 0,
                 'totals' => [],
             ];

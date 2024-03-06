@@ -1,100 +1,108 @@
 import { useState } from "react";
-import { PageProps, TableColumn, Pagination } from "@/types";
-import { Summary, TicketType, TransactionDetail } from "@/types/app";
+import { PageProps, TableColumn } from "@/types";
+import { TicketType, TransactionDetail } from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Table";
 import { currency, number } from "@/utils/formater";
-import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
-import TransactionSummary from "@/Components/TransactionSummary";
+import moment from "moment";
 
 interface Props extends PageProps {
     transactions: Array<any>;
-    dates: {
-        from: string | null;
-        to: string | null;
-    };
-    summary: Summary;
-    ticket_types: Array<TicketType>
+    ticket_types: Array<TicketType>;
+    years: Array<string>;
+    months: { [key: string | number]: string | number };
 }
 
 export default function Daily({
     auth,
     transactions,
-    summary,
-    dates: range,
-    ticket_types
+    ticket_types,
+    years,
+    months,
 }: Props) {
+    const [month, setMonth] = useState<string | number>(moment().format("M"));
+    const [year, setYear] = useState<string | number>(moment().format("YYYY"));
 
-    const { from, to } = range;
+    const [column] = useState<TableColumn>([
+        { header: "Tanggal", value: 'day', className: 'text-center font-bold'},
+        ...ticket_types.map((type) => ({
+            header: type.name,
+            value: (t: any) => (t[type.id] ? number(t[type.id] ?? "0") : "-"),
+            className: "text-center",
+        })),
+        {
+            header: "Total",
+            value: (t: TransactionDetail) => currency(t.total),
+            className: "text-right font-medium",
+        },
+    ]);
 
-    const [dates, setDates] = useState<DateValueType>({
-        startDate: from,
-        endDate: to,
-    });
-
-
-const [column] = useState<TableColumn>([
-    { header: "Tanggal", value: "date" },
-    ...ticket_types.map(type => ({
-        header: type.name,
-        value: (t: any) => number(t[type.id] ?? '0'),
-        className: "text-center",
-    })),
-    {
-        header: "Total",
-        value: (t: TransactionDetail) => currency(t.total),
-        className: "text-right font-medium",
-    },
-]);
-
-    const handleDatesChange = (newDates: DateValueType) => {
-        setDates(newDates);
+    const handleMonthChange = (value: string | number) => {
+        setMonth(value)
         router.reload({
             only: ["transactions", "summary"],
-            data: { page: 1, from: newDates?.startDate, to: newDates?.endDate },
+            data: { month: value, year },
         });
-    };
+    }
+
+    const handleYearChange = (value: string | number) => {
+        setYear(value)
+        router.reload({
+            only: ["transactions", "summary"],
+            data: { month, year: value },
+        });
+    }
 
     return (
-        <AppLayout title="Rekap Harian" user={auth?.user}>
-            <Head title="Rekap Harian" />
+        <AppLayout title="Rekap Bulanan" user={auth?.user}>
+            <Head title="Rekap Bulanan" />
 
             <div className="py-10">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 px-4">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full mb-5">
-                        <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1 mb-3 sm:mb-0">
-                            Rekap Harian
-                        </h2>
-                        <div className="flex items-center">
-                            <Datepicker
-                                value={dates}
-                                onChange={handleDatesChange}
-                                placeholder="Filter Tanggal"
-                                i18n="id"
-                                readOnly={true}
-                                showShortcuts
-                                displayFormat="DD MMM"
-                                startWeekOn="mon"
-                                configs={{
-                                    shortcuts: {
-                                        today: "Hari Ini",
-                                        yesterday: "Kemarin",
-                                        past: period => `${period}  hari terakhir`,
-                                        currentMonth: "Bulan Ini",
-                                        pastMonth: "Bulan Kemarin" 
-                                    },
-                                }}
-                            />
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 px-4 flex flex-col">
+                    <div className="grid grid-cols-12 gap-6 w-full mb-5">
+                        <div className="col-span-12">
+                            <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1">
+                                Rekap Bulanan
+                            </h2>
+                        </div>
+                        <div className="col-span-6 md:col-span-3 xl:col-span-2">
+                            <select
+                                value={month}
+                                onChange={(e) => handleMonthChange(e.target.value)}
+                                className="w-full rounded-md bg-white border-slate-200 shadow"
+                                placeholder='Bulan'
+                            >
+                                op
+                                {Object.keys(months).map((key) => (
+                                    <option key={key} value={key}>
+                                        {months[key]}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="col-span-6 md:col-span-3 xl:col-span-2">
+                            <select
+                                value={year}
+                                onChange={(e) => handleYearChange(e.target.value)}
+                                className="w-full rounded-md bg-white border-slate-200 shadow"
+                                placeholder='Tahun'
+                            >
+                                {years.map((y) => (
+                                    <option key={y} value={y}>
+                                        {y}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
                     <div className="mt-5">
-                        <TransactionSummary summary={summary} />
                         <Table
                             column={column}
                             data={transactions}
                             onClickRow={undefined}
+                            numbering={false}
                         />
                     </div>
                 </div>
