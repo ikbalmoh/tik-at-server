@@ -76,7 +76,7 @@ export default function AppLayout({
                                                     Laporan Transaksi
                                                 </Dropdown.Link>
                                                 <Dropdown.Link
-                                                    href={route("report.daily")}
+                                                    href={route("report.monthly")}
                                                 >
                                                     Rekap Bulanan
                                                 </Dropdown.Link>
@@ -243,8 +243,8 @@ export default function AppLayout({
                             Laporan Transaksi
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route("report.daily")}
-                            active={route().current("report.daily")}
+                            href={route("report.monthly")}
+                            active={route().current("report.monthly")}
                         >
                             Rekap Bulanan
                         </ResponsiveNavLink>

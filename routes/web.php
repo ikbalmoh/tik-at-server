@@ -19,7 +19,7 @@ use App\Http\Controllers\SettingController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/report/transaction', [ReportController::class, 'transaction'])->name('report.transaction');
-Route::get('/report/daily', [ReportController::class, 'daily'])->name('report.daily');
+Route::get('/report/monthly', [ReportController::class, 'monthly'])->name('report.monthly');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

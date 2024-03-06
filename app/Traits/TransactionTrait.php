@@ -56,7 +56,7 @@ trait TransactionTrait {
   public function dailyTransactions(string $month, string $year): array
     {
         $from = implode('-', [$year, $month, '01']);
-        $to = implode('-', [$year, $month, date('t')]);
+        $to = date('Y-m-t', mktime(0,0,0,$month,1,$year));
         $period = new \DatePeriod(
             new \DateTime($from),
             new \DateInterval('P1D'),

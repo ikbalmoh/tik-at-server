@@ -10,8 +10,6 @@ use Inertia\Response;
 use App\Traits\TransactionTrait;
 use Carbon\Carbon;
 
-use function PHPSTORM_META\map;
-
 class ReportController extends Controller
 {
     use TransactionTrait;
@@ -33,7 +31,7 @@ class ReportController extends Controller
         ]);
     }
 
-    public function daily(Request $request): Response
+    public function monthly(Request $request): Response
     {
         $years = Transaction::selectRaw('YEAR(created_at) as year')->whereNotNull('created_at')->groupBy('year')->orderByDesc('year')->pluck('year');
         if (empty($years)) {
