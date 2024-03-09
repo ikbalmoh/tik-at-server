@@ -23,7 +23,7 @@
     }
     th, td {
       border: 1px solid black;
-      padding: 10px;
+      padding: 2.5px;
     }
     tfoot {
       font-weight: 700;
