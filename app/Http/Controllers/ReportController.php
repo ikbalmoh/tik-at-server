@@ -77,7 +77,6 @@ class ReportController extends Controller
             'period' => Carbon::parse($year.'-'.$month.'-01')->translatedFormat('F Y'),
             'total' => $total
         ];
-        return view('pdf.report', $data);
         $pdf = Pdf::loadView('pdf.report', $data);
         return $pdf->download('data-pengunjung-'.$month.'-'.$year.'.pdf');
     }
