@@ -6,6 +6,9 @@ import { Head, router } from "@inertiajs/react";
 import Table from "@/Components/Table";
 import { currency, number } from "@/utils/formater";
 import moment from "moment";
+import {
+    IconDownload
+} from "@tabler/icons-react";
 
 interface Props extends PageProps {
     transactions: Array<any>;
@@ -60,13 +63,13 @@ export default function Daily({
 
             <div className="py-10">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 px-4 flex flex-col">
-                    <div className="grid grid-cols-12 gap-6 w-full mb-5">
-                        <div className="col-span-12">
-                            <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1">
+                    <div className="flex flex-wrap md:items-center w-full mb-5 -mx-1.5">
+                        <div className="md:flex-1 mb-3 md:mb-0 p-1.5">
+                            <h2 className="text-xl xl:text-2xl font-semibold text-gray-700 flex-1">
                                 Rekap Bulanan
                             </h2>
                         </div>
-                        <div className="col-span-6 md:col-span-3 xl:col-span-2">
+                        <div className="w-6/12 md:w-2/12 px-1.5">
                             <select
                                 value={month}
                                 onChange={(e) => handleMonthChange(e.target.value)}
@@ -81,7 +84,7 @@ export default function Daily({
                                 ))}
                             </select>
                         </div>
-                        <div className="col-span-6 md:col-span-3 xl:col-span-2">
+                        <div className="w-6/12 md:w-2/12 px-1.5">
                             <select
                                 value={year}
                                 onChange={(e) => handleYearChange(e.target.value)}
@@ -94,6 +97,11 @@ export default function Daily({
                                     </option>
                                 ))}
                             </select>
+                        </div>
+                        <div className="w-full md:w-min px-1.5 mt-3 md:mt-0 flex">
+                            <a href={route('report.download', {year, month})} target='_blank' className='text-sm w-full bg-blue-600 text-white text-center py-2.5 px-5 rounded-md flex items-center justify-center'>
+                                <IconDownload className="mr-2" size={"1.2rem"} /> Download
+                            </a>
                         </div>
                     </div>
 

@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Traits\TransactionTrait;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -53,6 +54,32 @@ class ReportController extends Controller
             'years' => $years,
             'months' => $months,
         ]);
+    }
+
+    public function download($year, $month)
+    {
+        $transactions = $this->dailyTransactions($month, $year);
+        $types = TicketType::all();
+        $total = [];
+        foreach ($types as $type) {
+            $total[$type->id] = 0;
+        }
+        foreach ($transactions as $key => $tr) {
+            foreach ($types as $type) {
+                $total[$type->id] += !empty($tr[$type->id]) ? $tr[$type->id] : 0;
+            }
+        }
+        $data = [
+            'transactions' => $transactions,
+            'types' => $types,
+            'year' => $year,
+            'month' => $month,
+            'period' => Carbon::parse($year.'-'.$month.'-01')->translatedFormat('F Y'),
+            'total' => $total
+        ];
+        return view('pdf.report', $data);
+        $pdf = Pdf::loadView('pdf.report', $data);
+        return $pdf->download('data-pengunjung-'.$month.'-'.$year.'.pdf');
     }
 
 }
