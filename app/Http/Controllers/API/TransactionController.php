@@ -63,6 +63,7 @@ class TransactionController extends Controller
             }
 
             $data = [
+                'transaction' => $transaction,
                 'tickets' => $tickets,
                 'message' => 'Transaction success'
             ];

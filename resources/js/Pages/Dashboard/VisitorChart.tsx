@@ -32,11 +32,11 @@ const filters: { [key: string]: string } = {
     monthly: "Bulanan",
 };
 
-export default function VisitorChart({
-    data,
-}: {
+interface VisitorChartProps {
     data: { [key: string]: ChartData<"bar", number, string> };
-}) {
+}
+
+export default function VisitorChart({ data }: VisitorChartProps) {
     const [filter, setFilter] = useState<string>("daily");
 
     const reload = () => router.reload({ only: ["chart"] });
@@ -84,10 +84,13 @@ export default function VisitorChart({
                                         text: "jumlah pengunjung",
                                     },
                                     beginAtZero: true,
+                                    grid: {
+                                        display: true,
+                                    },
                                 },
                                 x: {
                                     grid: {
-                                        display: false,
+                                        display: true,
                                     },
                                 },
                             },

@@ -1,4 +1,4 @@
-import { Sales } from "@/types/app";
+import { Sales, Ticket } from "@/types/app";
 import cls from "@/utils/cls";
 import { useState } from "react";
 import {
@@ -18,10 +18,20 @@ const filters: { [key: string]: string } = {
     year: "Tahun Ini",
 };
 
-export default function SalesSummary({ sales }: { sales: Sales }) {
+interface SalesSummaryProps {
+    sales: Sales;
+    ticketTypes: Ticket[];
+    colors: string[];
+}
+
+export default function SalesSummary({
+    sales,
+    ticketTypes,
+    colors,
+}: SalesSummaryProps) {
     const [filter, setFilter] = useState<string>("day");
 
-    const reload = () => router.reload({ only: ["sales"] });
+    const reload = () => router.reload({ only: ["sales", "ticketTypes"] });
 
     return (
         <>
@@ -71,56 +81,31 @@ export default function SalesSummary({ sales }: { sales: Sales }) {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <div className="bg-blue-100 border border-blue-500 px-5 py-7 rounded-lg text-blue-700 flex items-center">
-                        <div className="px-5">
-                            <IconUser size="2.5em" />
-                        </div>
-                        <div className="flex-1 ml-5">
-                            <div>
-                                <CountUp
-                                    start={0}
-                                    end={sales[filter]?.["dewasa"] ?? 0}
-                                    decimals={0}
-                                    className="text-2xl font-bold"
-                                />
+                {ticketTypes.map((type, idx) => (
+                    <div
+                        key={type.id}
+                        className="col-span-12 md:col-span-6 xl:col-span-3"
+                    >
+                        <div
+                            className={`bg-white border px-5 py-7 rounded-lg flex items-center border-gray-300 text-gray-500`}
+                        >
+                            <div className="px-5">
+                                <IconUser size="2.5em" />
                             </div>
-                            <h4>Dewasa</h4>
+                            <div className="flex-1 ml-5">
+                                <div>
+                                    <CountUp
+                                        start={0}
+                                        end={sales[filter]?.[type.id] ?? 0}
+                                        decimals={0}
+                                        className="text-2xl font-bold"
+                                    />
+                                </div>
+                                <h4>{type.name}</h4>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <div className="bg-pink-100 border border-pink-500 px-5 py-7 rounded-lg text-pink-700 flex items-center">
-                        <div className="px-5">
-                            <IconUserHeart size="2.5em" />
-                        </div>
-                        <div className="flex-1 ml-5">
-                            <CountUp
-                                start={0}
-                                end={sales[filter]?.["anak"] ?? 0}
-                                decimals={0}
-                                className="text-2xl font-bold"
-                            />
-                            <h4>Anak-anak</h4>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <div className="bg-orange-100 border border-orange-500 px-5 py-7 rounded-lg text-orange-700 flex items-center">
-                        <div className="px-5">
-                            <IconUserDollar size="2.5em" />
-                        </div>
-                        <div className="flex-1 ml-5">
-                            <CountUp
-                                start={0}
-                                end={sales[filter]?.["mancanegara"] ?? 0}
-                                decimals={0}
-                                className="text-2xl font-bold"
-                            />
-                            <h4>Mancanegara</h4>
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
         </>
     );

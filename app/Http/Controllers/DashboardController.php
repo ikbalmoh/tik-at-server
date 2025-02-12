@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TransactionDetail;
+use App\Models\TicketType;
 use Inertia\Response;
 use Inertia\Inertia;
 
@@ -11,39 +12,40 @@ class DashboardController extends Controller
     public function index(): Response
     {
         return Inertia::render('Dashboard/Dashboard', [
-            'sales' => fn () => $this->salesSummary(),
-            'chart' => fn () => $this->salesChart()
+            'sales' => fn() => $this->salesSummary(),
+            'chart' => fn() => $this->salesChart(),
+            'ticketTypes' => fn() => TicketType::where('is_active', true)->get(),
+            'colors' => config('ticket.colors')
         ]);
     }
 
     private function salesSummary(): array
     {
-        return [
+        $types = TicketType::all();
+
+        $summary = [
             'day' => [
                 'all' => TransactionDetail::whereDate('created_at', date('Y-m-d'))->sum('qty'),
-                'dewasa' => TransactionDetail::whereDate('created_at', date('Y-m-d'))->where('ticket_type_id', 1)->sum('qty'),
-                'anak' => TransactionDetail::whereDate('created_at', date('Y-m-d'))->where('ticket_type_id', 2)->sum('qty'),
-                'mancanegara' => TransactionDetail::whereDate('created_at', date('Y-m-d'))->where('ticket_type_id', 3)->sum('qty'),
             ],
             'week' => [
                 'all' => TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->sum('qty'),
-                'dewasa' => TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', 1)->sum('qty'),
-                'anak' => TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', 2)->sum('qty'),
-                'mancanegara' => TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', 3)->sum('qty')
             ],
             'month' => [
                 'all' => TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->sum('qty'),
-                'dewasa' => TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->where('ticket_type_id', 1)->sum('qty'),
-                'anak' => TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->where('ticket_type_id', 2)->sum('qty'),
-                'mancanegara' => TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->where('ticket_type_id', 3)->sum('qty')
             ],
             'year' => [
                 'all' => TransactionDetail::whereYear('created_at', date('Y'))->sum('qty'),
-                'dewasa' => TransactionDetail::whereYear('created_at', date('Y'))->where('ticket_type_id', 1)->sum('qty'),
-                'anak' => TransactionDetail::whereYear('created_at', date('Y'))->where('ticket_type_id', 2)->sum('qty'),
-                'mancanegara' => TransactionDetail::whereYear('created_at', date('Y'))->where('ticket_type_id', 3)->sum('qty')
             ]
         ];
+
+        foreach ($types as $key => $ticket) {
+            $summary['day'][$ticket->id] = TransactionDetail::whereDate('created_at', date('Y-m-d'))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['week'][$ticket->id] = TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['month'][$ticket->id] = TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['year'][$ticket->id] = TransactionDetail::whereYear('created_at', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
+        }
+
+        return $summary;
     }
 
     private function getGroupedTransaction(int $ticketTypeId = null, string $dateFrom = '', string $dateFormat = "%d/%m/%Y"): array
@@ -63,18 +65,17 @@ class DashboardController extends Controller
 
     private function salesChart()
     {
+        $types = TicketType::all();
+
         $data = [
-            'daily' => [
-                'dewasa' => [],
-                'anak' => [],
-                'mancanegara' => [],
-            ],
-            'monthly' => [
-                'dewasa' => [],
-                'anak' => [],
-                'mancanegara' => [],
-            ]
+            'daily' => [],
+            'monthly' => []
         ];
+
+        foreach ($types as $key => $type) {
+            $data['daily'][$type->id] = [];
+            $data['monthly'][$type->id] = [];
+        }
 
         $daily_from = date('Y-m-d', strtotime('-1 month'));
         $monthly_from = date('Y-m-d', strtotime('-12 month'));
@@ -87,95 +88,50 @@ class DashboardController extends Controller
             'monthly' => array_keys($monthly),
         ];
 
-        $daily_dewasa = $this->getGroupedTransaction(1, $daily_from);
-        $daily_anak = $this->getGroupedTransaction(2, $daily_from);
-        $daily_mancanegara = $this->getGroupedTransaction(3, $daily_from);
-        foreach ($labels['daily'] as $date) {
-            $total_d = 0;
-            $total_a = 0;
-            $total_m = 0;
-            if (isset($daily_dewasa[$date])) {
-                $total_d = $daily_dewasa[$date];
-            }
-            if (isset($daily_anak[$date])) {
-                $total_a = $daily_anak[$date];
-            }
-            if (isset($daily_mancanegara[$date])) {
-                $total_m = $daily_mancanegara[$date];
-            }
-            $data['daily']['dewasa'][] = $total_d;
-            $data['daily']['anak'][] = $total_a;
-            $data['daily']['mancanegara'][] = $total_m;
-        }
-
-        $monthly_dewasa = $this->getGroupedTransaction(1, $monthly_from, '%m/%Y');
-        $monthly_anak = $this->getGroupedTransaction(2, $monthly_from, '%m/%Y');
-        $monthly_mancanegara = $this->getGroupedTransaction(3, $monthly_from, '%m/%Y');
-        foreach ($labels['monthly'] as $date) {
-            $total_d = 0;
-            $total_a = 0;
-            $total_m = 0;
-            if (isset($monthly_dewasa[$date])) {
-                $total_d = $monthly_dewasa[$date];
-            }
-            if (isset($monthly_anak[$date])) {
-                $total_a = $monthly_anak[$date];
-            }
-            if (isset($monthly_mancanegara[$date])) {
-                $total_m = $monthly_mancanegara[$date];
-            }
-            $data['monthly']['dewasa'][] = $total_d;
-            $data['monthly']['anak'][] = $total_a;
-            $data['monthly']['mancanegara'][] = $total_m;
-        }
-
-
         $datasets = [
-            'daily' => [
-                [
-                    'label' => "Semua",
-                    'data' => array_values($daily),
-                    'backgroundColor' => "#66bb86",
-                ],
-                [
-                    'label' => "Dewasa",
-                    'data' => $data['daily']['dewasa'],
-                    'backgroundColor' => "#7bb5ff",
-                ],
-                [
-                    'label' => "Anak-anak",
-                    'data' => $data['daily']['anak'],
-                    'backgroundColor' => "#ff95c9",
-                ],
-                [
-                    'label' => "Mancanegara",
-                    'data' => $data['daily']['mancanegara'],
-                    'backgroundColor' => "#ff8f61",
-                ],
-            ],
-            'monthly' => [
-                [
-                    'label' => "Semua",
-                    'data' => array_values($monthly),
-                    'backgroundColor' => "#66bb86",
-                ],
-                [
-                    'label' => "Dewasa",
-                    'data' => $data['monthly']['dewasa'],
-                    'backgroundColor' => "#7bb5ff",
-                ],
-                [
-                    'label' => "Anak-anak",
-                    'data' => $data['monthly']['anak'],
-                    'backgroundColor' => "#ff95c9",
-                ],
-                [
-                    'label' => "Mancanegara",
-                    'data' => $data['monthly']['mancanegara'],
-                    'backgroundColor' => "#ff8f61",
-                ],
-            ],
+            'daily' => [],
+            'monthly' => [],
         ];
+
+        $data_daily = [];
+        $data_monthly = [];
+        foreach ($types as $key => $type) {
+            $data_daily[$type->id] = $this->getGroupedTransaction($type->id, $daily_from);
+            $data_monthly[$type->id] = $this->getGroupedTransaction($type->id, $monthly_from, '%m/%Y');
+        }
+
+        foreach ($labels['daily'] as $date) {
+            foreach ($types as $key => $type) {
+                if (isset($data_daily[$type->id][$date])) {
+                    $data['daily'][$type->id][] = (float)$data_daily[$type->id][$date];
+                }
+            }
+        }
+
+        foreach ($labels['monthly'] as $date) {
+            foreach ($types as $key => $type) {
+                if (isset($data_monthly[$type->id][$date])) {
+                    $data['monthly'][$type->id][] = (float)$data_monthly[$type->id][$date];
+                }
+            }
+        }
+
+        foreach ($types as $key => $type) {
+            $datasets['daily'][] =
+                [
+                    'label' => $type->name,
+                    'data' => $data['daily'][$type->id],
+                    'backgroundColor' => config('ticket.colors')[$key] ?? '',
+                ];
+                
+            $datasets['monthly'][] =
+                [
+                    'label' => $type->name,
+                    'data' => $data['monthly'][$type->id],
+                    'backgroundColor' => config('ticket.colors')[$key],
+                ];
+        }
+
 
         return [
             'daily' => [

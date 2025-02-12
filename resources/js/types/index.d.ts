@@ -12,6 +12,7 @@ export type PageProps<
     auth: {
         user: User;
     };
+    appName: string;
 };
 
 export type Pagination = {

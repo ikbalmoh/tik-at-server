@@ -1,4 +1,4 @@
-import { useState, PropsWithChildren, ReactNode } from "react";
+import { useState, PropsWithChildren } from "react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -76,7 +76,9 @@ export default function AppLayout({
                                                     Laporan Transaksi
                                                 </Dropdown.Link>
                                                 <Dropdown.Link
-                                                    href={route("report.monthly")}
+                                                    href={route(
+                                                        "report.monthly"
+                                                    )}
                                                 >
                                                     Rekap Bulanan
                                                 </Dropdown.Link>

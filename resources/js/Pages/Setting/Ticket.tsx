@@ -41,12 +41,12 @@ export default function Ticket({ auth, tickets }: Props) {
     const column: TableColumn = [
         { header: "Nama Tiket", value: "name" },
         {
-            header: "Harga Tiket",
+            header: "Harga Hari Biasa",
             value: (t: TicketProp) => currency(t.regular_price),
             className: "text-right",
         },
         {
-            header: "Harga Weekend",
+            header: "Harga Akhir Pekan",
             value: (t: TicketProp) => currency(t.holiday_price),
             className: "text-right",
         },
