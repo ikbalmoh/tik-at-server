@@ -32,7 +32,7 @@ export default function Dashboard({
                         sales={sales}
                     />
                     <div className="h-12"></div>
-                    <VisitorChart ticketTypes={ticketTypes} data={chart} />
+                    <VisitorChart data={chart} />
                 </div>
             </div>
         </AppLayout>
