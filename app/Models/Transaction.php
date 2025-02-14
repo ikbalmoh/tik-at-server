@@ -84,7 +84,7 @@ class Transaction extends Model
         ];
         $types = TicketType::pluck('id');
         foreach ($types as $id) {
-            $total[$id] = (int)  $this->details()->where('ticket_type_id', $id)->sum('qty');
+            $total[$id] = (int) $this->details()->where('ticket_type_id', $id)->sum('qty');
         }
         return $total;
     }

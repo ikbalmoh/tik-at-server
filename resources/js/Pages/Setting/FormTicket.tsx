@@ -27,6 +27,7 @@ export default function FormTicket({
         } else {
             reset();
             clearErrors();
+            setData("is_active", true);
         }
     }, [visible]);
 

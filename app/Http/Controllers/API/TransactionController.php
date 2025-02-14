@@ -7,6 +7,7 @@ use App\Http\Requests\StoreTransaction;
 use App\Models\Ticket;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -30,19 +31,35 @@ class TransactionController extends Controller
 
             $transaction = Transaction::create($trx_payload);
 
+            $qty = 0;
+
             $trx_payload_details = [];
             foreach ($request->tickets as $key => $t) {
+                $qty += $t['qty'];
                 $trx_payload_details[] = new TransactionDetail($t);
             }
 
             $transaction->details()->saveMany($trx_payload_details);
 
-            foreach ($transaction->details as $key => $detail) {
-                $data_tickets = [];
-                for ($i = 0; $i < $detail->qty; $i++) {
-                    $data_tickets[] = new Ticket();
+            $expires = Carbon::today()->setTime(17, 0, 0)->toDateTimeString();
+
+            $data_tickets = [];
+            if ($transaction->is_group) {
+                $detail = $transaction->details[0];
+                Ticket::create([
+                    'transaction_detail_id' => $detail->id,
+                    'expires_at' => $expires,
+                    'entrance_max' => $qty
+                ]);
+            } else {
+                foreach ($transaction->details as $key => $detail) {
+                    for ($i = 0; $i < $detail->qty; $i++) {
+                        $data_tickets[] = new Ticket([
+                            'expires_at' => $expires,
+                        ]);
+                    }
+                    $detail->tickets()->saveMany($data_tickets);
                 }
-                $detail->tickets()->saveMany($data_tickets);
             }
 
             $ticket_transaction = [
@@ -62,8 +79,10 @@ class TransactionController extends Controller
                 ], $ticket_transaction,);
             }
 
+            $receipt = Transaction::with('details')->find($transaction->id);
+
             $data = [
-                'transaction' => $transaction,
+                'transaction' => $receipt,
                 'tickets' => $tickets,
                 'message' => 'Transaction success'
             ];
