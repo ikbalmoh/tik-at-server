@@ -30,6 +30,7 @@ class StoreTransaction extends FormRequest
             'charge' => 'required',
             'payment_method' => 'required',
             'tickets' => 'required',
+            'note' => ['nullable', 'string'],
             'tickets.*.ticket_type_id' => [
                 'required',
                 Rule::exists('ticket_types', 'id')->where(function (Builder $query) {
