@@ -25,7 +25,7 @@ class TransactionController extends Controller
                 'charge',
                 'payment_method',
                 'payment_ref',
-                'purchase_date'
+                'note',
             ]);
             $trx_payload['user_id'] = $user->id;
 
