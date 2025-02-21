@@ -25,6 +25,7 @@ class TransactionController extends Controller
                 'charge',
                 'payment_method',
                 'payment_ref',
+                'purchase_date',
                 'note',
             ]);
             $trx_payload['user_id'] = $user->id;
@@ -43,19 +44,21 @@ class TransactionController extends Controller
 
             $expires = Carbon::today()->setTime(17, 0, 0)->toDateTimeString();
 
+            $tickets = [];
+
             $data_tickets = [];
             if ($transaction->is_group) {
                 $detail = $transaction->details[0];
                 Ticket::create([
                     'transaction_detail_id' => $detail->id,
                     'expires_at' => $expires,
-                    'entrance_max' => $qty
+                    'entrance_max' => $qty,
                 ]);
             } else {
                 foreach ($transaction->details as $key => $detail) {
                     for ($i = 0; $i < $detail->qty; $i++) {
                         $data_tickets[] = new Ticket([
-                            'expires_at' => $expires,
+                            'expires_at' => $expires
                         ]);
                     }
                     $detail->tickets()->saveMany($data_tickets);

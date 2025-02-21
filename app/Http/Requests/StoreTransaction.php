@@ -28,6 +28,7 @@ class StoreTransaction extends FormRequest
             'grand_total' => 'required',
             'pay' => 'required',
             'charge' => 'required',
+            'purchase_date' => ['required', 'date'],
             'payment_method' => 'required',
             'tickets' => 'required',
             'note' => ['nullable', 'string'],
