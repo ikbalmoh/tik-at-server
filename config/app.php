@@ -16,7 +16,9 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'eTiket'),
+    'name' => env('APP_NAME', 'eTiket Pariwisata'),
+
+    'upt' => env('UPT_NAME', 'Pariwisata Garut'),
 
     /*
     |--------------------------------------------------------------------------

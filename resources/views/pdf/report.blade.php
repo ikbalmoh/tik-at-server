@@ -66,7 +66,7 @@
         DATA PENGUNJUNG
       </div>
       <div class="h1">
-        UPT SITU BAGENDIT
+        UPT {{ config('app.upt') }}
       </div>
       <div class="h3">
         DINAS PARIWISATA DAN KEBUDAYAAN KABUPATEN GARUT
