@@ -31,6 +31,8 @@ class TicketController extends Controller
         $data['ticket'] = [
             'id' => $ticket->id,
             'entrance_max' => $ticket->entrance_max,
+            'created_at' => $ticket->created_at,
+            'updated_at' => $ticket->updated_at,
             'entrance_count' => $ticket->entrance_count,
             'expires_at' => $ticket->expires_at,
             'ticket_type_name' => $ticket->ticket_type_name,
@@ -52,6 +54,7 @@ class TicketController extends Controller
             'ticket' => null,
             'message' => 'Tiket tidak ditemukan',
             'valid' => false,
+            'id' => $id
         ];
 
         $ticket = Ticket::find($id);

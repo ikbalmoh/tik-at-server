@@ -14,6 +14,8 @@ class Transaction extends Model
 {
     use HasFactory, HasUuids;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id',
         'is_group',
@@ -25,13 +27,15 @@ class Transaction extends Model
         'gate',
         'purchase_date',
         'note',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
         'is_group' => 'boolean'
     ];
 
-    protected $appends = ['operator_name', 'total_ticket'];
+    protected $appends = ['operator_name', 'total_ticket', 'upt'];
 
     /**
      * Get the operator that owns the Transaction
@@ -88,5 +92,10 @@ class Transaction extends Model
             $total[$id] = (int) $this->details()->where('ticket_type_id', $id)->sum('qty');
         }
         return $total;
+    }
+
+    protected function getUptAttribute()
+    {
+        return config('app.upt');
     }
 }

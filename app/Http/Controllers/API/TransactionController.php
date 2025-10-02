@@ -29,6 +29,8 @@ class TransactionController extends Controller
                 'note',
             ]);
             $trx_payload['user_id'] = $user->id;
+            $trx_payload['created_at'] = $trx_payload['purchase_date'];
+            $trx_payload['updated_at'] = Carbon::now();
 
             $transaction = Transaction::create($trx_payload);
 
