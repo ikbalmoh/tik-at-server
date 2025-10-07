@@ -82,7 +82,6 @@ export default function FormTicket({
                                 onChange={(e) =>
                                     setData("name", e.target.value)
                                 }
-                                readOnly={data.id <= 3 ? true : false}
                             />
 
                             <InputError

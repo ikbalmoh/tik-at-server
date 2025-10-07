@@ -32,6 +32,6 @@ class TicketType extends Model
 
     protected function getCanDeleteAttribute(): bool
     {
-        return $this->id > 3;
+        return true;
     }
 }
