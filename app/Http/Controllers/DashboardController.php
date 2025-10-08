@@ -128,7 +128,7 @@ class DashboardController extends Controller
                 [
                     'label' => $type->name,
                     'data' => $data['monthly'][$type->id],
-                    'backgroundColor' => config('ticket.colors')[$key],
+                    'backgroundColor' => config('ticket.colors')[$key] ?? '#118ab2',
                 ];
         }
 
