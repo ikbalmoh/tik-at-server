@@ -19,6 +19,8 @@ return [
     'name' => env('APP_NAME', 'eTiket Pariwisata'),
 
     'upt' => env('UPT_NAME', 'Pariwisata Garut'),
+    'client_key' => env('UPT_CLIENT_KEY', ''),
+    'server_url' => env('SERVER_URL', ''),
 
     /*
     |--------------------------------------------------------------------------

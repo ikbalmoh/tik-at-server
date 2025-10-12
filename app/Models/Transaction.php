@@ -29,6 +29,7 @@ class Transaction extends Model
         'note',
         'created_at',
         'updated_at',
+        'synced_at',
     ];
 
     protected $casts = [
