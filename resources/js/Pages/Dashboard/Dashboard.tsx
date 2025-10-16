@@ -25,13 +25,12 @@ export default function Dashboard({
             <Head title="Dashboard" />
 
             <div className="py-10">
-                <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col gap-5">
                     <SalesSummary
                         colors={colors}
                         ticketTypes={ticketTypes}
                         sales={sales}
                     />
-                    <div className="h-12"></div>
                     <VisitorChart data={chart} />
                 </div>
             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TransactionDetail;
 use App\Models\TicketType;
+use Illuminate\Support\Facades\DB;
 use Inertia\Response;
 use Inertia\Inertia;
 
@@ -25,24 +26,24 @@ class DashboardController extends Controller
 
         $summary = [
             'day' => [
-                'all' => TransactionDetail::whereDate('created_at', date('Y-m-d'))->sum('qty'),
+                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', date('Y-m-d'))->sum('qty'),
             ],
             'week' => [
-                'all' => TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->sum('qty'),
+                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', '>', date('Y-m-d', strtotime('-7 days')))->sum('qty'),
             ],
             'month' => [
-                'all' => TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->sum('qty'),
+                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereMonth('purchase_date', date('m'))->whereYear('purchase_date', date('Y'))->sum('qty'),
             ],
             'year' => [
-                'all' => TransactionDetail::whereYear('created_at', date('Y'))->sum('qty'),
+                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereYear('purchase_date', date('Y'))->sum('qty'),
             ]
         ];
 
         foreach ($types as $key => $ticket) {
-            $summary['day'][$ticket->id] = TransactionDetail::whereDate('created_at', date('Y-m-d'))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['week'][$ticket->id] = TransactionDetail::whereDate('created_at', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['month'][$ticket->id] = TransactionDetail::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['year'][$ticket->id] = TransactionDetail::whereYear('created_at', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['day'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', date('Y-m-d'))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['week'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['month'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereMonth('purchase_date', date('m'))->whereYear('purchase_date', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['year'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereYear('purchase_date', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
         }
 
         return $summary;
@@ -50,14 +51,14 @@ class DashboardController extends Controller
 
     private function getGroupedTransaction(int $ticketTypeId = null, string $dateFrom = '', string $dateFormat = "%d/%m/%Y"): array
     {
-        $data = TransactionDetail::whereDate('created_at', '>=', $dateFrom);
+        $data = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', '>=', $dateFrom);
 
         if ($ticketTypeId) {
             $data->where('ticket_type_id', $ticketTypeId);
         }
 
         $data->select('ticket_type_id')
-            ->selectRaw('DATE_FORMAT(created_at, "' . $dateFormat . '") as date, SUM(qty) as total')
+            ->selectRaw('DATE_FORMAT(purchase_date, "' . $dateFormat . '") as date, SUM(qty) as total')
             ->groupBy('date');
 
         return $data->pluck('total', 'date')->toArray();
@@ -122,6 +123,8 @@ class DashboardController extends Controller
                     'label' => $type->name,
                     'data' => $data['daily'][$type->id],
                     'backgroundColor' => config('ticket.colors')[$key] ?? '',
+                    'borderRadius' => 99,
+                    'borderSkipped' => false
                 ];
                 
             $datasets['monthly'][] =
@@ -129,6 +132,8 @@ class DashboardController extends Controller
                     'label' => $type->name,
                     'data' => $data['monthly'][$type->id],
                     'backgroundColor' => config('ticket.colors')[$key] ?? '#118ab2',
+                    'borderRadius' => 99,
+                    'borderSkipped' => false
                 ];
         }
 

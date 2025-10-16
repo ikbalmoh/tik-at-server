@@ -34,7 +34,7 @@ class ReportController extends Controller
 
     public function monthly(Request $request): Response
     {
-        $years = Transaction::selectRaw('YEAR(created_at) as year')->whereNotNull('created_at')->groupBy('year')->orderByDesc('year')->pluck('year');
+        $years = Transaction::selectRaw('YEAR(purchase_date) as year')->whereNotNull('purchase_date')->groupBy('year')->orderByDesc('year')->pluck('year');
         if (empty($years)) {
             $years = [date('Y')];
         }

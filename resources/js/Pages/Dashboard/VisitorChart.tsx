@@ -42,9 +42,9 @@ export default function VisitorChart({ data }: VisitorChartProps) {
     const reload = () => router.reload({ only: ["chart"] });
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-8">
-                <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1 mb-2 md:mb-0">
+        <div>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-3">
+                <h2 className="text-base md:text-lg font-medium text-slate-500 flex-1 mb-2 md:mb-0">
                     Statistik Pengunjung
                 </h2>
                 <div className="flex items-center">
@@ -90,7 +90,7 @@ export default function VisitorChart({ data }: VisitorChartProps) {
                                 },
                                 x: {
                                     grid: {
-                                        display: true,
+                                        display: false,
                                     },
                                 },
                             },
@@ -103,6 +103,6 @@ export default function VisitorChart({ data }: VisitorChartProps) {
                     />
                 </div>
             </div>
-        </>
+        </div>
     );
 }

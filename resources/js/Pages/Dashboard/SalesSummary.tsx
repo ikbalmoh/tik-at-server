@@ -34,9 +34,9 @@ export default function SalesSummary({
     const reload = () => router.reload({ only: ["sales", "ticketTypes"] });
 
     return (
-        <>
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-5">
-                <h2 className="text-lg md:text-2xl font-medium text-gray-700 flex-1  mb-2 md:mb-0">
+        <div>
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-3">
+                <h2 className="text-base md:text-lg font-medium text-slate-500 flex-1 mb-2 md:mb-0">
                     Jumlah Pengunjung
                 </h2>
                 <div className="flex items-center">
@@ -66,7 +66,7 @@ export default function SalesSummary({
             </div>
             <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <div className="bg-green-100 border border-green-500 px-5 py-7 rounded-lg text-green-700 flex items-center">
+                    <div className="bg-white border border-salte-200 px-5 py-7 rounded-lg text-green-600 flex items-center">
                         <div className="px-5">
                             <IconUsers size="2.5em" />
                         </div>
@@ -87,7 +87,7 @@ export default function SalesSummary({
                         className="col-span-12 md:col-span-6 xl:col-span-3"
                     >
                         <div
-                            className={`bg-white border px-5 py-7 rounded-lg flex items-center border-gray-300 text-gray-500`}
+                            className={`bg-white border px-5 py-7 rounded-lg flex items-center border-slate-200 text-gray-500`}
                         >
                             <div className="px-5">
                                 <IconUser size="2.5em" />
@@ -107,6 +107,6 @@ export default function SalesSummary({
                     </div>
                 ))}
             </div>
-        </>
+        </div>
     );
 }
