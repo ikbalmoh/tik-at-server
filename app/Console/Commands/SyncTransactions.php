@@ -39,11 +39,11 @@ class SyncTransactions extends Command
             return;
         }
 
-        $herders = [
+        $headers = [
             'X-Client-Key' => $clientKey,
         ];
 
-        $ping = Http::withHeaders($herders)->get($serverUrl.'/api/ping');
+        $ping = Http::withHeaders($headers)->get($serverUrl.'/api/ping');
 
         if ($ping->failed()) {
             $this->error($ping);
@@ -77,15 +77,21 @@ class SyncTransactions extends Command
                 $transaction->tickets = $details;
                 return $transaction;
             });
+
         $totalTransactions = count($transactions);
         if ($totalTransactions == 0) {
             $this->info('no transactions to sync');
             return;
         }
 
+        $payload = $transactions->map(fn ($t) => (array) $t)->toArray();
+
         $this->info('syncing '.$totalTransactions.' transactions');
 
-        $syncRes = Http::withHeaders($herders)->post($serverUrl.'/api/transactions', $transactions);
+        $syncRes = Http::withHeaders($headers)
+            ->asJson()
+            ->withoutRedirecting()
+            ->post($serverUrl.'/api/transactions', $payload);
 
         if ($syncRes->failed()) {
             $this->error($syncRes);
