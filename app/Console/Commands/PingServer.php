@@ -47,6 +47,7 @@ class PingServer extends Command
             return;
         } else {
             $this->info('✅ connected to server');
+            $this->info($ping);
         }
     }
 }
