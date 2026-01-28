@@ -2,45 +2,48 @@
 
 namespace App\Traits;
 
-use App\Models\Transaction;
 use App\Models\TicketType;
-use App\Models\TransactionDetail;
+use DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-trait TransactionTrait {
-    public function getTransactions(string | null $from, string | null $to = ''): LengthAwarePaginator
+trait TransactionTrait
+{
+    public function getTransactions(string|null $from, string|null $to = ''): LengthAwarePaginator
     {
-        $transactions = Transaction::select('id', 'user_id', 'grand_total')
+        $transactions = DB::table('transactions')
+            ->select('id', 'user_id', 'grand_total')
             ->selectRaw('
-            DATE_FORMAT(created_at, "%d/%m/%Y %h:%i") as date
+            DATE_FORMAT(purchase_date, "%d/%m/%Y %h:%i") as date
         ');
 
         if ($from) {
-            $transactions->whereDate('created_at', '>=', $from);
+            $transactions->whereDate('purchase_date', '>=', $from);
         }
         if ($to) {
-            $transactions->whereDate('created_at', '<=', $to);
+            $transactions->whereDate('purchase_date', '<=', $to);
         }
 
-        return $transactions->orderByDesc('created_at')
+        return $transactions->orderByDesc('purchase_date')
             ->paginate()
             ->appends(['from' => $from, 'to' => $to]);
     }
 
-  public function transactionSummary(string | null $from, string | null $to = ''): array
+    public function transactionSummary(string|null $from, string|null $to = ''): array
     {
-        $transactions = TransactionDetail::selectRaw('
-                SUM(qty) as qty,
-                SUM(total) as total,
-                MAX(created_at) as date_to,
-                MIN(created_at) as date_from
+        $transactions = DB::table('transaction_details as td')
+            ->join('transactions as t', 't.id', 'td.transaction_id')
+            ->selectRaw('
+                SUM(td.qty) as qty,
+                SUM(td.total) as total,
+                MAX(t.purchase_date) as date_to,
+                MIN(t.purchase_date) as date_from
             ');
 
         if ($from) {
-            $transactions->whereDate('created_at', '>=', $from);
+            $transactions->whereDate('t.purchase_date', '>=', $from);
         }
         if ($to) {
-            $transactions->whereDate('created_at', '<=', $to);
+            $transactions->whereDate('t.purchase_date', '<=', $to);
         }
 
         $sum = $transactions->first();
@@ -53,24 +56,26 @@ trait TransactionTrait {
         ];
     }
 
-  public function dailyTransactions(string $month, string $year): array
+    public function dailyTransactions(string $month, string $year): array
     {
         $from = implode('-', [$year, $month, '01']);
-        $to = date('Y-m-t', mktime(0,0,0,$month,1,$year));
+        $to = date('Y-m-t', mktime(0, 0, 0, $month, 1, $year));
         $period = new \DatePeriod(
             new \DateTime($from),
             new \DateInterval('P1D'),
-            new \DateTime(date('Y-m-d', strtotime($to.' +1 day')))
-       );
+            new \DateTime(date('Y-m-d', strtotime($to . ' +1 day')))
+        );
 
-        $transactions = TransactionDetail::select('id')
+        $transactions = DB::table('transaction_details as d')
+            ->join('transactions as t', 't.id', 'd.transaction_id')
+            ->select('d.id')
             ->selectRaw('
-            SUM(qty) as qty,
-            ticket_type_id,
-            DATE_FORMAT(created_at, "%Y-%m-%d") as date,
-            DATE_FORMAT(created_at, "%d") as day,
-            SUM(total) as total
-        ')->whereYear('created_at', $year)->whereMonth('created_at', $month)
+            SUM(d.qty) as qty,
+            d.ticket_type_id,
+            DATE_FORMAT(t.purchase_date, "%Y-%m-%d") as date,
+            DATE_FORMAT(t.purchase_date, "%d") as day,
+            SUM(d.total) as total
+        ')->whereYear('t.purchase_date', $year)->whereMonth('t.purchase_date', $month)
             ->groupBy('date')->groupBy('ticket_type_id')
             ->get();
 
@@ -103,7 +108,7 @@ trait TransactionTrait {
                 $transaction['total'] = $dayTransaction['total'];
                 $transaction['totals'] = $dayTransaction['totals'];
                 foreach ($ticketTypes as $key => $type) {
-                    $transaction[$type] = !empty($dayTransaction[$type]) ? (int)$dayTransaction[$type] : 0;
+                    $transaction[$type] = !empty($dayTransaction[$type]) ? (int) $dayTransaction[$type] : 0;
                 }
             }
             $data[] = $transaction;
