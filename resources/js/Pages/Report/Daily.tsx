@@ -11,7 +11,6 @@ import { IconDownload } from "@tabler/icons-react";
 interface Props extends PageProps {
     transactions: Array<any>;
     ticket_types: Array<TicketType>;
-    years: Array<string>;
     months: { [key: string | number]: string | number };
 }
 
@@ -19,7 +18,6 @@ export default function Daily({
     auth,
     transactions,
     ticket_types,
-    years,
     months,
 }: Props) {
     const [month, setMonth] = useState<string | number>(moment().format("M"));
@@ -27,6 +25,11 @@ export default function Daily({
 
     const [column] = useState<TableColumn>([
         { header: "Tanggal", value: "day", className: "text-center font-bold" },
+        {
+            header: "Jumlah",
+            value: (t: TransactionDetail) => t?.qty ?? "0",
+            className: "text-center font-medium",
+        },
         ...ticket_types.map((type) => ({
             header: type.name,
             value: (t: any) => (t[type.id] ? number(t[type.id] ?? "0") : "-"),
@@ -54,6 +57,8 @@ export default function Daily({
             data: { month, year: value },
         });
     };
+
+    console.log("transactions", transactions);
 
     return (
         <AppLayout title="Rekap Bulanan" user={auth?.user}>
@@ -85,20 +90,14 @@ export default function Daily({
                             </select>
                         </div>
                         <div className="w-6/12 md:w-2/12 px-1.5">
-                            <select
+                            <input
+                                type="number"
+                                className="w-full rounded-md bg-white border-slate-200 shadow"
                                 value={year}
                                 onChange={(e) =>
                                     handleYearChange(e.target.value)
                                 }
-                                className="w-full rounded-md bg-white border-slate-200 shadow"
-                                placeholder="Tahun"
-                            >
-                                {years.map((y) => (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
                         <div className="w-full md:w-min px-1.5 mt-3 md:mt-0 flex">
                             <a

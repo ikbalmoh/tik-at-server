@@ -16,7 +16,8 @@ export interface Transaction {
     grand_total: number;
     date: string;
     operator_name: string;
-    total_ticket: any;
+    qty: number;
+    total_ticket: { [key: string]: number };
     operator: Operator;
 }
 

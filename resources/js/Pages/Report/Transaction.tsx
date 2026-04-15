@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { PageProps, TableColumn, Pagination } from "@/types";
-import { Summary, TicketType, Transaction as TransactionProp } from "@/types/app";
+import {
+    Summary,
+    TicketType,
+    Transaction as TransactionProp,
+} from "@/types/app";
 import AppLayout from "@/Layouts/AppLayout";
 import { Head, router, usePage } from "@inertiajs/react";
 import Table from "@/Components/Table";
@@ -22,15 +26,16 @@ interface Props extends PageProps {
     ticket_types: Array<TicketType>;
 }
 
-
 export default function Transaction({
     auth,
     transactions,
     dates: range,
     summary,
-    ticket_types
+    ticket_types,
 }: Props) {
     const { data, ...pagination } = transactions;
+
+    console.log({ pagination, data, ticket_types });
 
     const { from, to } = range;
 
@@ -39,26 +44,28 @@ export default function Transaction({
         endDate: to,
     });
 
-
-const column: TableColumn = [
-    { header: "Waktu", value: "date" },
-    { header: "Kasir", value: "operator_name" },
-    ...ticket_types.map(type => ({
-        header: type.name,
-        value: (t: TransactionProp) => t?.total_ticket[type.id] ? number(t?.total_ticket[type.id]) : "-",
-        className: "text-center",
-    })),
-    {
-        header: "Jumlah",
-        value: (t: TransactionProp) => t?.total_ticket?.all ?? "0",
-        className: "text-center font-bold",
-    },
-    {
-        header: "Total",
-        value: (t: TransactionProp) => currency(t.grand_total),
-        className: "text-right font-bold",
-    },
-];
+    const column: TableColumn = [
+        { header: "Waktu", value: "date" },
+        { header: "Kasir", value: "operator_name" },
+        {
+            header: "Jumlah",
+            value: (t: TransactionProp) => t?.qty ?? "0",
+            className: "text-center font-bold",
+        },
+        ...ticket_types.map((type) => ({
+            header: type.name,
+            value: (t: TransactionProp) =>
+                t?.total_ticket?.[type.id]
+                    ? number(t?.total_ticket[type.id])
+                    : "0",
+            className: "text-center",
+        })),
+        {
+            header: "Total",
+            value: (t: TransactionProp) => currency(t.grand_total),
+            className: "text-right font-bold",
+        },
+    ];
 
     const handleDatesChange = (newDates: DateValueType) => {
         setDates(newDates);
@@ -92,9 +99,10 @@ const column: TableColumn = [
                                     shortcuts: {
                                         today: "Hari Ini",
                                         yesterday: "Kemarin",
-                                        past: period => `${period}  hari terakhir`,
+                                        past: (period) =>
+                                            `${period}  hari terakhir`,
                                         currentMonth: "Bulan Ini",
-                                        pastMonth: "Bulan Kemarin" 
+                                        pastMonth: "Bulan Kemarin",
                                     },
                                 }}
                             />

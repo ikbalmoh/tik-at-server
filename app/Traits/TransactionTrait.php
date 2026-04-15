@@ -10,22 +10,44 @@ trait TransactionTrait
 {
     public function getTransactions(string|null $from, string|null $to = ''): LengthAwarePaginator
     {
-        $transactions = DB::table('transactions')
-            ->select('id', 'user_id', 'grand_total')
+        $transactions = DB::table('transactions as t')
+            ->join('users as u', 'u.id', 't.user_id')
+            ->select('t.id', 't.user_id', 't.grand_total', 'u.name as operator_name')
             ->selectRaw('
-            DATE_FORMAT(purchase_date, "%d/%m/%Y %h:%i") as date
+            DATE_FORMAT(t.purchase_date, "%d/%m/%Y %h:%i") as date,
+            (SELECT CAST(IFNULL(SUM(qty), 0) AS UNSIGNED) FROM transaction_details td WHERE td.transaction_id = t.id) as qty
         ');
 
-        if ($from) {
-            $transactions->whereDate('purchase_date', '>=', $from);
-        }
-        if ($to) {
-            $transactions->whereDate('purchase_date', '<=', $to);
+        $ticketTypes = TicketType::pluck('id');
+        foreach ($ticketTypes as $id) {
+            $transactions->selectRaw(
+                "(SELECT CAST(IFNULL(SUM(qty), 0) AS UNSIGNED) FROM transaction_details td WHERE td.transaction_id = t.id AND td.ticket_type_id = ?) as `t_{$id}`",
+                [$id]
+            );
         }
 
-        return $transactions->orderByDesc('purchase_date')
+        if ($from) {
+            $transactions->whereDate('t.purchase_date', '>=', $from);
+        }
+        if ($to) {
+            $transactions->whereDate('t.purchase_date', '<=', $to);
+        }
+
+        $paginator = $transactions->orderByDesc('t.purchase_date')
             ->paginate()
             ->appends(['from' => $from, 'to' => $to]);
+
+        $paginator->through(function ($item) use ($ticketTypes) {
+            $total_ticket = [];
+            foreach ($ticketTypes as $id) {
+                $total_ticket[$id] = $item->{"t_{$id}"};
+                unset($item->{"t_{$id}"});
+            }
+            $item->total_ticket = $total_ticket;
+            return $item;
+        });
+
+        return $paginator;
     }
 
     public function transactionSummary(string|null $from, string|null $to = ''): array
@@ -87,10 +109,12 @@ trait TransactionTrait
             if (!isset($groupByDate[$tr->date])) {
                 $groupByDate[$tr->date] = [
                     'total' => 0,
+                    'qty' => 0,
                     'totals' => []
                 ];
             }
             $groupByDate[$tr->date]['total'] += $tr->total;
+            $groupByDate[$tr->date]['qty'] += $tr->qty;
             $groupByDate[$tr->date]['totals'][] = $tr->total;
             $groupByDate[$tr->date][$tr->ticket_type_id] = $tr->qty;
         }
@@ -100,11 +124,13 @@ trait TransactionTrait
             $transaction = [
                 'date' => $value->format('Y-m-d'),
                 'day' => $value->format('j'),
+                'qty' => 0,
                 'total' => 0,
                 'totals' => [],
             ];
             if (isset($groupByDate[$value->format('Y-m-d')])) {
                 $dayTransaction = $groupByDate[$value->format('Y-m-d')];
+                $transaction['qty'] = $dayTransaction['qty'];
                 $transaction['total'] = $dayTransaction['total'];
                 $transaction['totals'] = $dayTransaction['totals'];
                 foreach ($ticketTypes as $key => $type) {
