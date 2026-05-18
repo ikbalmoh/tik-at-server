@@ -2,48 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TransactionDetail;
 use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 use Inertia\Response;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $date = $request->date ?? date('Y-m-d');
         return Inertia::render('Dashboard/Dashboard', [
-            'sales' => fn() => $this->salesSummary(),
+            'sales' => fn() => $this->salesSummary($date),
             'chart' => fn() => $this->salesChart(),
             'ticketTypes' => fn() => TicketType::where('is_active', true)->get(),
             'colors' => config('ticket.colors')
         ]);
     }
 
-    private function salesSummary(): array
+    private function salesSummary(?string $date = null): array
     {
+        $carbon = $date ? \Carbon\Carbon::parse($date) : \Carbon\Carbon::today();
         $types = TicketType::all();
+
+        $query = fn() => DB::table('transaction_details as d')
+            ->join('transactions as t', 't.id', 'd.transaction_id');
 
         $summary = [
             'day' => [
-                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', date('Y-m-d'))->sum('qty'),
+                'all' => $query()->whereDate('purchase_date', $carbon->toDateString())->sum('qty'),
             ],
             'week' => [
-                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', '>', date('Y-m-d', strtotime('-7 days')))->sum('qty'),
+                'all' => $query()->whereDate('purchase_date', '>', $carbon->copy()->subDays(7)->toDateString())->sum('qty'),
             ],
             'month' => [
-                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereMonth('purchase_date', date('m'))->whereYear('purchase_date', date('Y'))->sum('qty'),
+                'all' => $query()->whereMonth('purchase_date', $carbon->month)->whereYear('purchase_date', $carbon->year)->sum('qty'),
             ],
             'year' => [
-                'all' => DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereYear('purchase_date', date('Y'))->sum('qty'),
-            ]
+                'all' => $query()->whereYear('purchase_date', $carbon->year)->sum('qty'),
+            ],
         ];
 
-        foreach ($types as $key => $ticket) {
-            $summary['day'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', date('Y-m-d'))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['week'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereDate('purchase_date', '>', date('Y-m-d', strtotime('-7 days')))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['month'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereMonth('purchase_date', date('m'))->whereYear('purchase_date', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
-            $summary['year'][$ticket->id] = DB::table('transaction_details as d')->join('transactions as t', 't.id', 'd.transaction_id')->whereYear('purchase_date', date('Y'))->where('ticket_type_id', $ticket->id)->sum('qty');
+        foreach ($types as $ticket) {
+            $summary['day'][$ticket->id] = $query()->whereDate('purchase_date', $carbon->toDateString())->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['week'][$ticket->id] = $query()->whereDate('purchase_date', '>', $carbon->copy()->subDays(7)->toDateString())->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['month'][$ticket->id] = $query()->whereMonth('purchase_date', $carbon->month)->whereYear('purchase_date', $carbon->year)->where('ticket_type_id', $ticket->id)->sum('qty');
+            $summary['year'][$ticket->id] = $query()->whereYear('purchase_date', $carbon->year)->where('ticket_type_id', $ticket->id)->sum('qty');
         }
 
         return $summary;
@@ -104,7 +109,7 @@ class DashboardController extends Controller
         foreach ($labels['daily'] as $date) {
             foreach ($types as $key => $type) {
                 if (isset($data_daily[$type->id][$date])) {
-                    $data['daily'][$type->id][] = (float)$data_daily[$type->id][$date];
+                    $data['daily'][$type->id][] = (float) $data_daily[$type->id][$date];
                 }
             }
         }
@@ -112,7 +117,7 @@ class DashboardController extends Controller
         foreach ($labels['monthly'] as $date) {
             foreach ($types as $key => $type) {
                 if (isset($data_monthly[$type->id][$date])) {
-                    $data['monthly'][$type->id][] = (float)$data_monthly[$type->id][$date];
+                    $data['monthly'][$type->id][] = (float) $data_monthly[$type->id][$date];
                 }
             }
         }
@@ -126,7 +131,7 @@ class DashboardController extends Controller
                     'borderRadius' => 99,
                     'borderSkipped' => false
                 ];
-                
+
             $datasets['monthly'][] =
                 [
                     'label' => $type->name,

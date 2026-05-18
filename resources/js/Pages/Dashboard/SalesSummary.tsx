@@ -1,22 +1,12 @@
 import { Sales, Ticket } from "@/types/app";
 import cls from "@/utils/cls";
-import { useState } from "react";
-import {
-    IconUserHeart,
-    IconUserDollar,
-    IconUser,
-    IconRefresh,
-    IconUsers,
-} from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import { IconUser, IconRefresh, IconUsers } from "@tabler/icons-react";
 import CountUp from "react-countup";
 import { router } from "@inertiajs/react";
-
-const filters: { [key: string]: string } = {
-    day: "Hari Ini",
-    week: "7 Hari",
-    month: "1 Bulan",
-    year: "Tahun Ini",
-};
+import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
+import moment from "moment";
+import "moment/locale/id";
 
 interface SalesSummaryProps {
     sales: Sales;
@@ -30,38 +20,65 @@ export default function SalesSummary({
     colors,
 }: SalesSummaryProps) {
     const [filter, setFilter] = useState<string>("day");
+    const [dates, setDates] = useState<DateValueType>({
+        startDate: new Date(),
+        endDate: new Date(),
+    });
 
-    const reload = () => router.reload({ only: ["sales", "ticketTypes"] });
+    const onChangeDate = (value: DateValueType) => {
+        setDates(value);
+        router.reload({
+            only: ["sales", "ticketTypes"],
+            data: { date: value?.startDate },
+        });
+    };
+
+    const filters: { [key: string]: string } = useMemo(() => {
+        const date = moment(dates?.startDate).locale("id");
+        return {
+            day: "1 Hari",
+            week:
+                date.clone().subtract(6, "days").format("D MMM") +
+                " - " +
+                date.format("D MMM"),
+            month: date.format("MMMM YYYY"),
+            year: date.format("YYYY"),
+        };
+    }, [dates]);
 
     return (
         <div>
             <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full mb-3">
-                <h2 className="text-base md:text-lg font-medium text-slate-500 flex-1 mb-2 md:mb-0">
-                    Jumlah Pengunjung
-                </h2>
-                <div className="flex items-center">
+                <div className="flex items-center gap-5">
+                    <h2 className="text-base md:text-lg font-medium text-slate-500 flex-1 mb-2 md:mb-0 whitespace-nowrap">
+                        Jumlah Pengunjung
+                    </h2>
+                    <Datepicker
+                        value={dates}
+                        onChange={onChangeDate}
+                        asSingle
+                        useRange={false}
+                        startWeekOn="mon"
+                        displayFormat={"D MMM YYYY"}
+                        i18n="id"
+                    />
+                </div>
+                <div className="flex items-center gap-0">
                     {Object.keys(filters).map((key) => (
                         <button
                             onClick={() => setFilter(key)}
                             type="button"
                             key={key}
                             className={cls(
-                                "text-sm py-2 px-1 mx-1 border-b-2",
+                                "text-sm whitespace-nowrap py-2 px-1 mx-1 border-b-2",
                                 filter === key
                                     ? "text-blue-700 border-blue-600"
-                                    : "text-gray-700 font-medium border-none"
+                                    : "text-gray-700 font-medium border-none",
                             )}
                         >
                             {filters[key]}
                         </button>
                     ))}
-                    <button
-                        onClick={reload}
-                        type="button"
-                        className="ml-auto md:ml-3"
-                    >
-                        <IconRefresh className="h-4" />
-                    </button>
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-6">
@@ -77,7 +94,7 @@ export default function SalesSummary({
                                 decimals={0}
                                 className="text-2xl font-bold"
                             />
-                            <h4>Tiket Terjual</h4>
+                            <h4>Total Pengunjung</h4>
                         </div>
                     </div>
                 </div>
