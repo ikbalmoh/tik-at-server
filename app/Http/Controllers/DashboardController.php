@@ -16,7 +16,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Dashboard', [
             'sales' => fn() => $this->salesSummary($date),
             'chart' => fn() => $this->salesChart(),
-            'ticketTypes' => fn() => TicketType::where('is_active', true)->get(),
+            'ticketTypes' => fn() => TicketType::where('is_active', true)->where('regular_price', '>', 0)->where('holiday_price', '>', 0)->get(),
             'colors' => config('ticket.colors')
         ]);
     }
@@ -24,7 +24,7 @@ class DashboardController extends Controller
     private function salesSummary(?string $date = null): array
     {
         $carbon = $date ? \Carbon\Carbon::parse($date) : \Carbon\Carbon::today();
-        $types = TicketType::all();
+        $types = TicketType::where('is_active', true)->where('regular_price', '>', 0)->where('holiday_price', '>', 0)->get();
 
         $query = fn() => DB::table('transaction_details as d')
             ->join('transactions as t', 't.id', 'd.transaction_id');
@@ -71,7 +71,7 @@ class DashboardController extends Controller
 
     private function salesChart()
     {
-        $types = TicketType::all();
+        $types = TicketType::where('is_active', true)->where('regular_price', '>', 0)->where('holiday_price', '>', 0)->get();
 
         $data = [
             'daily' => [],

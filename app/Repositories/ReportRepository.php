@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Traits;
+namespace App\Repositories;
 
 use App\Models\TicketType;
 use DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-trait TransactionTrait
+final class ReportRepository
 {
     public function getTransactions(string|null $from, string|null $to = ''): LengthAwarePaginator
     {
@@ -18,7 +18,7 @@ trait TransactionTrait
             (SELECT CAST(IFNULL(SUM(qty), 0) AS UNSIGNED) FROM transaction_details td WHERE td.transaction_id = t.id) as qty
         ');
 
-        $ticketTypes = TicketType::pluck('id');
+        $ticketTypes = TicketType::forReport()->pluck('id');
         foreach ($ticketTypes as $id) {
             $transactions->selectRaw(
                 "(SELECT CAST(IFNULL(SUM(qty), 0) AS UNSIGNED) FROM transaction_details td WHERE td.transaction_id = t.id AND td.ticket_type_id = ?) as `t_{$id}`",
@@ -102,7 +102,7 @@ trait TransactionTrait
             ->get();
 
 
-        $ticketTypes = TicketType::pluck('id');
+        $ticketTypes = TicketType::forReport()->pluck('id');
 
         $groupByDate = [];
         foreach ($transactions as $key => $tr) {
